@@ -1,40 +1,31 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Simona Management</title>
+    <title>Simona Management Pro</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-        body { font-family: 'Segoe UI', sans-serif; padding: 15px; background: #f8f9fa; margin-bottom: 80px; }
+        body { font-family: 'Segoe UI', sans-serif; padding: 15px; background: #f8f9fa; margin-bottom: 80px; color: #2c3e50; }
         .header { text-align: center; margin-bottom: 20px; }
         .blessing { font-style: italic; color: #95a5a6; font-size: 0.8em; }
-        
-        #searchBar { 
-            width: 100%; padding: 15px; margin-bottom: 20px; box-sizing: border-box;
-            border-radius: 25px; border: 1px solid #dfe6e9; font-size: 16px; outline: none;
-        }
+        #searchBar { width: 100%; padding: 15px; margin-bottom: 20px; border-radius: 25px; border: 1px solid #dfe6e9; font-size: 16px; outline: none; box-sizing: border-box; }
 
-        /* Design Cards */
-        .card { 
-            background: white; padding: 20px; margin-bottom: 15px; 
-            border-radius: 15px; border-left: 6px solid #d4a017; 
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05); cursor: pointer;
-        }
-        .design-no { font-size: 1.3em; font-weight: bold; margin-bottom: 5px; }
-        .price { color: #27ae60; font-weight: 600; }
+        .card { background: white; padding: 18px; margin-bottom: 15px; border-radius: 15px; border-left: 6px solid #d4a017; box-shadow: 0 4px 10px rgba(0,0,0,0.05); position: relative; }
+        .design-no { font-size: 1.3em; font-weight: bold; }
+        .price { color: #27ae60; font-weight: 600; margin: 5px 0; }
+        
+        .delete-btn { position: absolute; top: 15px; right: 15px; background: #ff7675; color: white; border: none; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 0.75em; font-weight: bold; }
 
-        /* Popups (Details & Form) */
-        .modal { display: none; position: fixed; z-index: 200; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); overflow-y: auto; }
-        .modal-content { background: white; margin: 5% auto; padding: 20px; border-radius: 20px; width: 90%; max-width: 500px; }
+        .modal { display: none; position: fixed; z-index: 200; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); overflow-y: auto; }
+        .modal-content { background: white; margin: 5% auto; padding: 25px; border-radius: 20px; width: 85%; max-width: 450px; }
         
-        /* Form Grid */
-        .grid { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 8px; margin-bottom: 8px; }
-        input { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ddd; box-sizing: border-box; }
+        .grid { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 8px; margin-bottom: 10px; }
+        input { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #ddd; box-sizing: border-box; font-size: 14px; }
         
-        .calc-box { background: #fffcf5; padding: 15px; border-radius: 10px; border: 1px dashed #d4a017; margin: 15px 0; }
-        .detail-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #eee; }
+        .calc-box { background: #fffcf5; padding: 15px; border-radius: 12px; border: 1px dashed #d4a017; margin: 15px 0; }
+        .detail-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #eee; font-size: 0.9em; }
         
-        .fab { position: fixed; bottom: 25px; right: 25px; width: 60px; height: 60px; background: #d4a017; color: white; border-radius: 50%; font-size: 30px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.3); cursor: pointer; z-index: 100; }
-        .save-btn { width: 100%; padding: 15px; background: #27ae60; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        .fab { position: fixed; bottom: 25px; right: 25px; width: 65px; height: 65px; background: #d4a017; color: white; border-radius: 50%; font-size: 35px; display: flex; align-items: center; justify-content: center; box-shadow: 0 5px 20px rgba(0,0,0,0.3); cursor: pointer; z-index: 100; }
+        .save-btn { width: 100%; padding: 15px; background: #27ae60; color: white; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; margin-top: 10px; font-size: 16px; }
     </style>
 </head>
 <body>
@@ -45,22 +36,22 @@
     </div>
 
     <input type="text" id="searchBar" placeholder="Search Design No..." onkeyup="filterData()">
-    <div id="display-area">Loading...</div>
+    <div id="display-area">Loading Simona Data...</div>
 
     <div class="fab" onclick="openForm()">+</div>
 
     <div id="detailsModal" class="modal">
         <div class="modal-content">
-            <span onclick="closeModal('detailsModal')" style="float:right; cursor:pointer; font-size:24px;">&times;</span>
-            <h2 id="modalTitle" style="color:#d4a017">Details</h2>
+            <span onclick="closeModal('detailsModal')" style="float:right; cursor:pointer; font-size:28px;">&times;</span>
+            <h2 id="modalTitle" style="color:#d4a017; margin-top:0">Details</h2>
             <div id="modalBody"></div>
         </div>
     </div>
 
     <div id="formModal" class="modal">
-        <div class="form-content modal-content">
+        <div class="modal-content">
             <h2 style="color:#d4a017; margin-top:0">New Design</h2>
-            <input type="text" id="designNo" placeholder="Design No (e.g. 101/A)" style="margin-bottom:10px">
+            <input type="text" id="designNo" placeholder="Design No" style="margin-bottom:15px; font-weight:bold; border: 1px solid #d4a017;">
             <div id="fabric-inputs"></div>
             <div class="grid" style="grid-template-columns: 1fr 1fr 1fr;">
                 <input type="number" id="hand" placeholder="Hand" oninput="calculate()">
@@ -68,21 +59,21 @@
                 <input type="number" id="pack" placeholder="Pack" oninput="calculate()">
             </div>
             <div class="calc-box">
-                <div>Total Cost: <span id="viewTotalCost">₹0</span></div>
-                <input type="number" id="wholesale" placeholder="Wholesale Price" oninput="calculate()" style="margin-top:10px">
-                <div style="margin-top:10px; font-weight:bold">Profit: <span id="viewProfit">₹0 (0%)</span></div>
+                <div style="display:flex; justify-content:space-between"><span>Total Cost:</span><span id="viewTotalCost">₹0</span></div>
+                <input type="number" id="wholesale" placeholder="Wholesale Price" oninput="calculate()" style="margin-top:10px; background:#e8f5e9">
+                <div style="margin-top:10px; font-weight:bold; display:flex; justify-content:space-between"><span>Profit:</span><span id="viewProfit">₹0 (0%)</span></div>
             </div>
-            <button class="save-btn" id="saveButton" onclick="saveEntry()">Save to Sheet</button>
-            <button onclick="closeModal('formModal')" style="width:100%; background:none; border:none; color:red; margin-top:10px; cursor:pointer">Cancel</button>
+            <button class="save-btn" id="saveButton" onclick="saveEntry()">Save to Google Sheet</button>
+            <button onclick="closeModal('formModal')" style="width:100%; background:none; border:none; color:#e74c3c; margin-top:15px; cursor:pointer; font-weight:bold">Cancel</button>
         </div>
     </div>
 
     <script>
-        const mySheetUrl = "https://script.google.com/macros/s/AKfycby6im_Yzw3aK-TqWnIt-mxflF13LkEwMC12QjWRdg8hNVZ1kdO-bqbM2mEaXfKR5saCcw/exec"; 
+        const mySheetUrl = "https://script.google.com/macros/s/AKfycbwsyNcZOSkDxhDZTS3BY5SwlXzpWGflAGC5Iru8ph2o-xbL5LlLCoaKdMhe8zggDKbcEA/exec"; 
         let allData = [];
-        const labels = ["Design No", "F1 Name", "F1 Qty", "F1 Rate", "F2 Name", "F2 Qty", "F2 Rate", "F3 Name", "F3 Qty", "F3 Rate", "F4 Name", "F4 Qty", "F4 Rate", "F5 Name", "F5 Qty", "F5 Rate", "F6 Name", "F6 Qty", "F6 Rate", "Total Fabric", "Dye Cost", "Handwork", "Stitching", "Packing", "Total Cost", "Wholesale Price", "Total Profit"];
+        const labels = ["Design No", "F1 Name", "F1 Qty", "F1 Rate", "F2 Name", "F2 Qty", "F2 Rate", "F3 Name", "F3 Qty", "F3 Rate", "F4 Name", "F4 Qty", "F4 Rate", "F5 Name", "F5 Qty", "F5 Rate", "F6 Name", "F6 Qty", "F6 Rate", "Total Fabric Cost", "Dye Cost", "Handwork", "Stitching", "Packing", "Total Cost", "Wholesale Rate", "Total Profit"];
 
-        // Setup Fabric Inputs
+        // Setup 6 Fabric Inputs
         let fHtml = "";
         for(let i=1; i<=6; i++) {
             fHtml += `<div class="grid"><input type="text" id="f${i}n" placeholder="Fabric ${i}"><input type="number" id="f${i}q" placeholder="Qty" oninput="calculate()"><input type="number" id="f${i}r" placeholder="Rate" oninput="calculate()"></div>`;
@@ -90,23 +81,29 @@
         document.getElementById('fabric-inputs').innerHTML = fHtml;
 
         async function loadData() {
-            const res = await fetch(mySheetUrl);
-            allData = await res.json();
-            renderCards(allData);
+            try {
+                const res = await fetch(mySheetUrl);
+                allData = await res.json();
+                renderCards(allData);
+            } catch(e) { document.getElementById('display-area').innerHTML = "Connection Error..."; }
         }
 
         function renderCards(data) {
             let html = "";
             data.forEach((row, index) => {
                 if(row[0]) {
-                    html += `<div class="card" onclick="showDetails(${index})">
-                        <div class="design-no">${row[0]}</div>
-                        <div class="price">Wholesale: ₹${row[25] || '0'}</div>
-                        <small style="color:#999">Tap for full details</small>
+                    html += `
+                    <div class="card">
+                        <button class="delete-btn" onclick="deleteEntry('${row[0]}')">Delete</button>
+                        <div onclick="showDetails(${index})">
+                            <div class="design-no">${row[0]}</div>
+                            <div class="price">Wholesale: ₹${row[25] || '0'}</div>
+                            <small style="color:#d4a017">Tap for breakdown →</small>
+                        </div>
                     </div>`;
                 }
             });
-            document.getElementById('display-area').innerHTML = html;
+            document.getElementById('display-area').innerHTML = html || "No designs found.";
         }
 
         function showDetails(index) {
@@ -121,21 +118,41 @@
 
         function calculate() {
             let fTotal = 0;
-            for(let i=1; i<=6; i++) fTotal += (parseFloat(document.getElementById(`f${i}q`).value)||0) * (parseFloat(document.getElementById(`f${i}r`).value)||0);
+            for(let i=1; i<=6; i++) {
+                let q = parseFloat(document.getElementById(`f${i}q`).value) || 0;
+                let r = parseFloat(document.getElementById(`f${i}r`).value) || 0;
+                fTotal += (q * r);
+            }
             let other = (parseFloat(document.getElementById('hand').value)||0) + (parseFloat(document.getElementById('stitch').value)||0) + (parseFloat(document.getElementById('pack').value)||0);
             let total = fTotal + other;
             let ws = parseFloat(document.getElementById('wholesale').value)||0;
             let profit = ws - total;
             let margin = ws > 0 ? (profit/ws)*100 : 0;
+            
             document.getElementById('viewTotalCost').innerText = "₹" + total.toFixed(2);
             document.getElementById('viewProfit').innerText = "₹" + profit.toFixed(2) + " (" + margin.toFixed(1) + "%)";
+            document.getElementById('viewProfit').style.color = profit >= 0 ? "#27ae60" : "#e74c3c";
         }
 
         async function saveEntry() {
-            document.getElementById('saveButton').innerText = "Saving...";
-            const d = { designNo: document.getElementById('designNo').value, f1n: document.getElementById('f1n').value, f1q: document.getElementById('f1q').value, f1r: document.getElementById('f1r').value, f2n: document.getElementById('f2n').value, f2q: document.getElementById('f2q').value, f2r: document.getElementById('f2r').value, f3n: document.getElementById('f3n').value, f3q: document.getElementById('f3q').value, f3r: document.getElementById('f3r').value, f4n: document.getElementById('f4n').value, f4q: document.getElementById('f4q').value, f4r: document.getElementById('f4r').value, f5n: document.getElementById('f5n').value, f5q: document.getElementById('f5q').value, f5r: document.getElementById('f5r').value, f6n: document.getElementById('f6n').value, f6q: document.getElementById('f6q').value, f6r: document.getElementById('f6r').value, hand: document.getElementById('hand').value, stitch: document.getElementById('stitch').value, pack: document.getElementById('pack').value, wholesale: document.getElementById('wholesale').value };
+            const design = document.getElementById('designNo').value;
+            if(!design) return alert("Enter Design No");
+            document.getElementById('saveButton').innerText = "Uploading...";
+            
+            const d = { designNo: design, f1n: document.getElementById('f1n').value, f1q: document.getElementById('f1q').value, f1r: document.getElementById('f1r').value, f2n: document.getElementById('f2n').value, f2q: document.getElementById('f2q').value, f2r: document.getElementById('f2r').value, f3n: document.getElementById('f3n').value, f3q: document.getElementById('f3q').value, f3r: document.getElementById('f3r').value, f4n: document.getElementById('f4n').value, f4q: document.getElementById('f4q').value, f4r: document.getElementById('f4r').value, f5n: document.getElementById('f5n').value, f5q: document.getElementById('f5q').value, f5r: document.getElementById('f5r').value, f6n: document.getElementById('f6n').value, f6q: document.getElementById('f6q').value, f6r: document.getElementById('f6r').value, hand: document.getElementById('hand').value, stitch: document.getElementById('stitch').value, pack: document.getElementById('pack').value, wholesale: document.getElementById('wholesale').value };
+            
             await fetch(mySheetUrl, { method: "POST", body: JSON.stringify(d) });
-            location.reload();
+            closeModal('formModal');
+            loadData();
+            document.getElementById('saveButton').innerText = "Save to Google Sheet";
+        }
+
+        async function deleteEntry(designNo) {
+            if (confirm("Delete Design " + designNo + " permanently?")) {
+                const d = { action: 'delete', designNo: designNo };
+                await fetch(mySheetUrl, { method: "POST", body: JSON.stringify(d) });
+                loadData();
+            }
         }
 
         function filterData() {
@@ -145,6 +162,7 @@
 
         function openForm() { document.getElementById('formModal').style.display = "block"; }
         function closeModal(id) { document.getElementById(id).style.display = "none"; }
+        
         loadData();
     </script>
 </body>
