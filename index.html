@@ -4,69 +4,77 @@
     <title>Simona Management Pro</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-        body { font-family: 'Segoe UI', sans-serif; padding: 15px; background: #f8f9fa; margin-bottom: 80px; }
+        body { font-family: 'Segoe UI', sans-serif; padding: 15px; background: #f8f9fa; margin-bottom: 80px; color: #2c3e50; }
         .header { text-align: center; margin-bottom: 20px; }
-        #searchBar { width: 100%; padding: 15px; margin-bottom: 20px; border-radius: 25px; border: 1px solid #dfe6e9; outline: none; box-sizing: border-box; }
+        .blessing { font-style: italic; color: #95a5a6; font-size: 0.8em; }
+        #searchBar { width: 100%; padding: 15px; margin-bottom: 20px; border-radius: 25px; border: 1px solid #dfe6e9; font-size: 16px; outline: none; box-sizing: border-box; }
+
+        /* Card Styling */
+        .card { background: white; padding: 18px; margin-bottom: 15px; border-radius: 15px; border-left: 6px solid #d4a017; box-shadow: 0 4px 10px rgba(0,0,0,0.05); position: relative; cursor: pointer; }
+        .design-no { font-size: 1.3em; font-weight: bold; }
+        .price { color: #27ae60; font-weight: 600; margin: 5px 0; }
         
-        .card { background: white; padding: 18px; margin-bottom: 15px; border-radius: 15px; border-left: 6px solid #d4a017; box-shadow: 0 4px 10px rgba(0,0,0,0.05); position: relative; }
-        .design-no { font-size: 1.2em; font-weight: bold; }
-        .price { color: #27ae60; font-weight: 600; margin-top: 5px; }
-        
-        .delete-btn { position: absolute; top: 15px; right: 15px; background: #ff7675; color: white; border: none; padding: 6px 10px; border-radius: 6px; cursor: pointer; font-size: 0.7em; }
+        /* Action Buttons */
+        .delete-btn { position: absolute; top: 15px; right: 15px; background: #ff7675; color: white; border: none; padding: 6px 10px; border-radius: 6px; cursor: pointer; font-size: 0.7em; font-weight: bold; }
         .order-btn { position: absolute; top: 15px; right: 75px; background: #27ae60; color: white; border: none; padding: 6px 10px; border-radius: 6px; cursor: pointer; font-size: 0.7em; font-weight: bold; }
 
+        /* Modals */
         .modal { display: none; position: fixed; z-index: 200; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); overflow-y: auto; }
         .modal-content { background: white; margin: 5% auto; padding: 25px; border-radius: 20px; width: 85%; max-width: 450px; }
         input { width: 100%; padding: 12px; margin-bottom: 12px; border-radius: 8px; border: 1px solid #ddd; box-sizing: border-box; font-size: 14px; }
         
-        .save-btn { width: 100%; padding: 15px; background: #27ae60; color: white; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; }
-        .fab { position: fixed; bottom: 25px; right: 25px; width: 65px; height: 65px; background: #d4a017; color: white; border-radius: 50%; font-size: 35px; display: flex; align-items: center; justify-content: center; box-shadow: 0 5px 15px rgba(0,0,0,0.3); z-index: 100; cursor: pointer; }
-        .detail-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #eee; font-size: 0.9em; }
+        .save-btn { width: 100%; padding: 15px; background: #27ae60; color: white; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 16px; }
+        .fab { position: fixed; bottom: 25px; right: 25px; width: 65px; height: 65px; background: #d4a017; color: white; border-radius: 50%; font-size: 35px; display: flex; align-items: center; justify-content: center; box-shadow: 0 5px 15px rgba(0,0,0,0.3); cursor: pointer; z-index: 100; }
+        .detail-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #eee; font-size: 0.9em; }
     </style>
 </head>
 <body>
 
     <div class="header">
-        <div style="color:#95a5a6; font-style:italic; font-size:0.8em">"SHREE"</div>
+        <div class="blessing">"SHREE"</div>
         <h1>Simona Design List</h1>
     </div>
 
     <input type="text" id="searchBar" placeholder="Search Design No..." onkeyup="filterData()">
-    <div id="display-area">Loading Designs...</div>
+    <div id="display-area">Loading Data...</div>
 
-    <div class="fab" onclick="openCostForm()">+</div>
+    <div class="fab" onclick="alert('Use the cards to place orders or delete. Use Sheet for new costs.')">+</div>
 
     <div id="orderModal" class="modal">
         <div class="modal-content">
-            <h2 style="color:#27ae60">New Order: <span id="orderDesignLabel"></span></h2>
+            <h2 style="color:#27ae60; margin-top:0">New Order: <span id="orderDesignLabel"></span></h2>
             <input type="text" id="partyName" placeholder="Party / Client Name">
-            <input type="text" id="sizeBreakdown" placeholder="Sizes (e.g. 2-L, 4-XL, 2-XXL)">
-            <input type="number" id="orderQty" placeholder="Total Quantity">
-            <input type="number" id="orderRate" placeholder="Rate Per Piece">
+            <input type="text" id="sizeBreakdown" placeholder="Size Breakdown (e.g. 2-L, 4-XL)">
+            <input type="number" id="orderQty" placeholder="Quantity Ordered">
+            <input type="number" id="orderRate" placeholder="Rate / Piece">
             <label style="font-size: 0.8em; color: #666;">Target Delivery Date:</label>
             <input type="date" id="targetDate">
             <button class="save-btn" onclick="saveOrder()">Confirm Order</button>
-            <button onclick="closeModal('orderModal')" style="width:100%; background:none; border:none; color:red; margin-top:15px; cursor:pointer">Cancel</button>
+            <button onclick="closeModal('orderModal')" style="width:100%; background:none; border:none; color:red; margin-top:15px; cursor:pointer; font-weight:bold">Cancel</button>
         </div>
     </div>
 
     <div id="detailsModal" class="modal">
         <div class="modal-content">
-            <span onclick="closeModal('detailsModal')" style="float:right; cursor:pointer; font-size:24px;">&times;</span>
-            <h2 style="color:#d4a017">Design Details</h2>
+            <span onclick="closeModal('detailsModal')" style="float:right; cursor:pointer; font-size:28px;">&times;</span>
+            <h2 style="color:#d4a017; margin-top:0">Full Details</h2>
             <div id="modalBody"></div>
         </div>
     </div>
 
     <script>
+        // PASTE YOUR NEW DEPLOYMENT URL BELOW
         const mySheetUrl = "https://script.google.com/macros/s/AKfycbyq5EgMclOCQ97lUoWOgrsHsqq7E5m4bUGwILsUukqtPi46heEsEve35bs5DvxIJb3wTg/exec"; 
+        
         let allData = [];
         const labels = ["Design No", "F1 Name", "F1 Qty", "F1 Rate", "F2 Name", "F2 Qty", "F2 Rate", "F3 Name", "F3 Qty", "F3 Rate", "F4 Name", "F4 Qty", "F4 Rate", "F5 Name", "F5 Qty", "F5 Rate", "F6 Name", "F6 Qty", "F6 Rate", "Total Fabric", "Dye Cost", "Handwork", "Stitching", "Packing", "Total Cost", "Wholesale Rate", "Total Profit"];
 
         async function loadData() {
-            const res = await fetch(mySheetUrl);
-            allData = await res.json();
-            renderCards(allData);
+            try {
+                const res = await fetch(mySheetUrl);
+                allData = await res.json();
+                renderCards(allData);
+            } catch(e) { document.getElementById('display-area').innerHTML = "Check your URL and try again."; }
         }
 
         function renderCards(data) {
@@ -75,12 +83,12 @@
                 if(row[0]) {
                     html += `
                     <div class="card">
-                        <button class="delete-btn" onclick="deleteEntry('${row[0]}')">Delete</button>
-                        <button class="order-btn" onclick="openOrderForm('${row[0]}', '${row[25]}')">Order</button>
+                        <button class="delete-btn" onclick="event.stopPropagation(); deleteEntry('${row[0]}')">Delete</button>
+                        <button class="order-btn" onclick="event.stopPropagation(); openOrderForm('${row[0]}', '${row[25]}')">Order</button>
                         <div onclick="showDetails(${index})">
                             <div class="design-no">${row[0]}</div>
                             <div class="price">Wholesale: ₹${row[25] || '0'}</div>
-                            <small style="color:#d4a017">Tap for full details →</small>
+                            <small style="color:#d4a017">Tap for details →</small>
                         </div>
                     </div>`;
                 }
@@ -113,13 +121,13 @@
                 targetDate: document.getElementById('targetDate').value
             };
             await fetch(mySheetUrl, { method: "POST", body: JSON.stringify(d) });
-            alert("Order saved to DG Sheet!");
+            alert("Order sent to DG Order Sheet!");
             closeModal('orderModal');
             loadData();
         }
 
         async function deleteEntry(designNo) {
-            if(confirm("Delete Design " + designNo + "?")) {
+            if(confirm("Delete Design " + designNo + " from the sheet?")) {
                 await fetch(mySheetUrl, { method: "POST", body: JSON.stringify({action: 'delete', designNo: designNo}) });
                 loadData();
             }
