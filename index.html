@@ -1,145 +1,177 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Simona Management Pro</title>
+    <title>Simona Pro</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-        body { font-family: 'Segoe UI', sans-serif; padding: 15px; background: #f8f9fa; margin-bottom: 80px; color: #2c3e50; }
+        body { font-family: 'Segoe UI', sans-serif; padding: 15px 15px 70px 15px; background: #f8f9fa; color: #2c3e50; }
         .header { text-align: center; margin-bottom: 20px; }
-        .blessing { font-style: italic; color: #95a5a6; font-size: 0.8em; }
-        #searchBar { width: 100%; padding: 15px; margin-bottom: 20px; border-radius: 25px; border: 1px solid #dfe6e9; font-size: 16px; outline: none; box-sizing: border-box; }
-
-        /* Card Styling */
-        .card { background: white; padding: 18px; margin-bottom: 15px; border-radius: 15px; border-left: 6px solid #d4a017; box-shadow: 0 4px 10px rgba(0,0,0,0.05); position: relative; cursor: pointer; }
-        .design-no { font-size: 1.3em; font-weight: bold; }
-        .price { color: #27ae60; font-weight: 600; margin: 5px 0; }
         
-        /* Action Buttons */
-        .delete-btn { position: absolute; top: 15px; right: 15px; background: #ff7675; color: white; border: none; padding: 6px 10px; border-radius: 6px; cursor: pointer; font-size: 0.7em; font-weight: bold; }
-        .order-btn { position: absolute; top: 15px; right: 75px; background: #27ae60; color: white; border: none; padding: 6px 10px; border-radius: 6px; cursor: pointer; font-size: 0.7em; font-weight: bold; }
+        /* Bottom Navbar */
+        .navbar { position: fixed; bottom: 0; left: 0; width: 100%; height: 60px; background: white; box-shadow: 0 -4px 10px rgba(0,0,0,0.1); display: flex; align-items: center; z-index: 500; }
+        .nav-btn { flex: 1; text-align: center; font-weight: bold; padding: 10px; color: #7f8c8d; cursor: pointer; border-right: 1px solid #eee; }
+        .nav-btn:last-child { border-right: none; }
+        .nav-btn.active { color: #d4a017; background: #fffcf5; }
+
+        /* General UI Elements */
+        #searchBar { width: 100%; padding: 15px; margin-bottom: 20px; border-radius: 25px; border: 1px solid #dfe6e9; font-size: 16px; outline: none; box-sizing: border-box; }
+        .page { display: none; } /* Pages are hidden by default */
+        .page.active { display: block; } /* Only active page is shown */
+
+        /* Card Elements */
+        .card { background: white; padding: 18px; margin-bottom: 15px; border-radius: 15px; border-left: 6px solid #d4a017; box-shadow: 0 4px 10px rgba(0,0,0,0.05); cursor: pointer; position: relative;}
+        .design-no { font-size: 1.25em; font-weight: bold; }
+        .wholesale { color: #27ae60; font-weight: 600; margin: 5px 0; }
+        .tap-details { color: #d4a017; font-size: 0.8em; }
 
         /* Modals */
-        .modal { display: none; position: fixed; z-index: 200; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); overflow-y: auto; }
-        .modal-content { background: white; margin: 5% auto; padding: 25px; border-radius: 20px; width: 85%; max-width: 450px; }
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); overflow-y: auto; }
+        .modal-content { background: white; margin: 10% auto; padding: 25px; border-radius: 20px; width: 85%; max-width: 450px; }
         input { width: 100%; padding: 12px; margin-bottom: 12px; border-radius: 8px; border: 1px solid #ddd; box-sizing: border-box; font-size: 14px; }
+        .detail-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #eee; font-size: 0.9em; }
         
         .save-btn { width: 100%; padding: 15px; background: #27ae60; color: white; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 16px; }
-        .fab { position: fixed; bottom: 25px; right: 25px; width: 65px; height: 65px; background: #d4a017; color: white; border-radius: 50%; font-size: 35px; display: flex; align-items: center; justify-content: center; box-shadow: 0 5px 15px rgba(0,0,0,0.3); cursor: pointer; z-index: 100; }
-        .detail-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #eee; font-size: 0.9em; }
+        .fab { position: fixed; bottom: 80px; right: 25px; width: 65px; height: 65px; background: #d4a017; color: white; border-radius: 50%; font-size: 35px; display: flex; align-items: center; justify-content: center; box-shadow: 0 5px 15px rgba(0,0,0,0.3); z-index: 100; cursor: pointer; }
+    
+        /* Styling adjustments for delete-btn if needed later */
+        .delete-btn { position: absolute; top: 15px; right: 15px; background: #ff7675; color: white; border: none; padding: 6px 10px; border-radius: 5px; cursor: pointer; font-size: 0.7em; }
     </style>
 </head>
 <body>
 
     <div class="header">
-        <div class="blessing">"SHREE"</div>
-        <h1>Simona Design List</h1>
+        <div style="color:#95a5a6; font-style:italic; font-size:0.8em">"SHREE"</div>
+        <h1 id="pageTitle">Simona Design List</h1>
     </div>
 
-    <input type="text" id="searchBar" placeholder="Search Design No..." onkeyup="filterData()">
-    <div id="display-area">Loading Data...</div>
+    <div id="costPage" class="page active">
+        <input type="text" id="searchCost" placeholder="Search Design No..." onkeyup="filterData('cost')">
+        <div id="costDisplay">Loading Designs...</div>
+        <div class="fab" onclick="alert('Use Google Sheet for new costs.')">+</div>
+    </div>
 
-    <div class="fab" onclick="alert('Use the cards to place orders or delete. Use Sheet for new costs.')">+</div>
+    <div id="orderPage" class="page">
+        <input type="text" id="searchOrder" placeholder="Search Party / Design No..." onkeyup="filterData('order')">
+        <div id="orderDisplay">Loading Orders...</div>
+        <div class="fab" onclick="alert('New Orders form is disabled. Use phone Order button.')">+</div>
+    </div>
 
-    <div id="orderModal" class="modal">
-        <div class="modal-content">
-            <h2 style="color:#27ae60; margin-top:0">New Order: <span id="orderDesignLabel"></span></h2>
-            <input type="text" id="partyName" placeholder="Party / Client Name">
-            <input type="text" id="sizeBreakdown" placeholder="Size Breakdown (e.g. 2-L, 4-XL)">
-            <input type="number" id="orderQty" placeholder="Quantity Ordered">
-            <input type="number" id="orderRate" placeholder="Rate / Piece">
-            <label style="font-size: 0.8em; color: #666;">Target Delivery Date:</label>
-            <input type="date" id="targetDate">
-            <button class="save-btn" onclick="saveOrder()">Confirm Order</button>
-            <button onclick="closeModal('orderModal')" style="width:100%; background:none; border:none; color:red; margin-top:15px; cursor:pointer; font-weight:bold">Cancel</button>
-        </div>
+    <div class="navbar">
+        <div class="nav-btn active" id="navCost" onclick="switchPage('cost')">Cost Sheet</div>
+        <div class="nav-btn" id="navOrder" onclick="switchPage('order')">Order Sheet</div>
     </div>
 
     <div id="detailsModal" class="modal">
         <div class="modal-content">
             <span onclick="closeModal('detailsModal')" style="float:right; cursor:pointer; font-size:28px;">&times;</span>
-            <h2 style="color:#d4a017; margin-top:0">Full Details</h2>
+            <h2 id="modalTitle" style="color:#d4a017; margin-top:0">Details</h2>
             <div id="modalBody"></div>
         </div>
     </div>
 
     <script>
-        // PASTE YOUR NEW DEPLOYMENT URL BELOW
-        const mySheetUrl = "https://script.google.com/macros/s/AKfycbyq5EgMclOCQ97lUoWOgrsHsqq7E5m4bUGwILsUukqtPi46heEsEve35bs5DvxIJb3wTg/exec"; 
-        
-        let allData = [];
-        const labels = ["Design No", "F1 Name", "F1 Qty", "F1 Rate", "F2 Name", "F2 Qty", "F2 Rate", "F3 Name", "F3 Qty", "F3 Rate", "F4 Name", "F4 Qty", "F4 Rate", "F5 Name", "F5 Qty", "F5 Rate", "F6 Name", "F6 Qty", "F6 Rate", "Total Fabric", "Dye Cost", "Handwork", "Stitching", "Packing", "Total Cost", "Wholesale Rate", "Total Profit"];
+        const mySheetUrl = "https://script.google.com/macros/s/AKfycbyMCuAgaFZzPUf9L15qpJ_qXQjXZSu3F9ZuAzikM0SHAvjOIVSEYem9cFZd8gehQIdK0A/exec"; 
+        let costData = [];
+        let orderData = [];
+        const costLabels = ["Design No", "F1 Name", "F1 Qty", "F1 Rate", "F2 Name", "F2 Qty", "F2 Rate", "F3 Name", "F3 Qty", "F3 Rate", "F4 Name", "F4 Qty", "F4 Rate", "F5 Name", "F5 Qty", "F5 Rate", "F6 Name", "F6 Qty", "F6 Rate", "Total Fabric", "Dye Cost", "Handwork", "Stitching", "Packing", "Total Cost", "Wholesale Rate", "Total Profit"];
+        const orderLabels = ["SI No", "Party Name", "Order Date", "Target Date", "Design No", "Quantity", "Size Breakdown", "Rate / Piece", "Total Order Value", "Delivery Date", "Qty Delivered", "Invoice / LR No", "Pending Qty", "Order Status"];
 
-        async function loadData() {
+        // 1. Core Functions
+        async function loadData(sheet) {
             try {
-                const res = await fetch(mySheetUrl);
-                allData = await res.json();
-                renderCards(allData);
-            } catch(e) { document.getElementById('display-area').innerHTML = "Check your URL and try again."; }
+                const res = await fetch(mySheetUrl + "?sheet=" + sheet);
+                const data = await res.json();
+                if (sheet === "Cost Sheet") {
+                    costData = data;
+                    renderCostCards(costData);
+                } else {
+                    orderData = data;
+                    renderOrderCards(orderData);
+                }
+            } catch(e) { document.getElementById(sheet === "Cost Sheet" ? 'costDisplay' : 'orderDisplay').innerHTML = "Error loading " + sheet; }
         }
 
-        function renderCards(data) {
+        // 2. Rendering (Drawing Cards)
+        function renderCostCards(data) {
             let html = "";
             data.forEach((row, index) => {
                 if(row[0]) {
                     html += `
-                    <div class="card">
-                        <button class="delete-btn" onclick="event.stopPropagation(); deleteEntry('${row[0]}')">Delete</button>
-                        <button class="order-btn" onclick="event.stopPropagation(); openOrderForm('${row[0]}', '${row[25]}')">Order</button>
-                        <div onclick="showDetails(${index})">
-                            <div class="design-no">${row[0]}</div>
-                            <div class="price">Wholesale: ₹${row[25] || '0'}</div>
-                            <small style="color:#d4a017">Tap for details →</small>
-                        </div>
+                    <div class="card" onclick="showDetails(${index}, 'cost')">
+                        <div class="design-no">${row[0]}</div>
+                        <div class="wholesale">Wholesale: ₹${row[25] || '0'}</div>
+                        <div class="tap-details">Tap for details →</div>
                     </div>`;
                 }
             });
-            document.getElementById('display-area').innerHTML = html || "No designs found.";
+            document.getElementById('costDisplay').innerHTML = html || "No designs found.";
         }
 
-        function showDetails(index) {
-            const row = allData[index];
+        function renderOrderCards(data) {
+            let html = "";
+            data.forEach((row, index) => {
+                if(row[0]) {
+                    html += `
+                    <div class="card" onclick="showDetails(${index}, 'order')">
+                        <div class="party-name" style="font-size:1.1em; font-weight:bold;">${row[1]}</div>
+                        <div class="order-design-no" style="font-weight:600">Design: ${row[4]}</div>
+                        <div class="order-date" style="color:#7f8c8d; font-size:0.8em">Order Date: ${formatDate(row[2])}</div>
+                        <div class="tap-details" style="margin-top:5px">Tap for more details →</div>
+                    </div>`;
+                }
+            });
+            document.getElementById('orderDisplay').innerHTML = html || "No orders found.";
+        }
+
+        // 3. UI Interactions (Popups, Navigation)
+        function switchPage(page) {
+            // Update Title
+            document.getElementById('pageTitle').innerText = (page === 'cost' ? 'Simona Design List' : 'Simona Order List');
+
+            // Toggle active page
+            document.getElementById('costPage').classList.toggle('active', page === 'cost');
+            document.getElementById('orderPage').classList.toggle('active', page === 'order');
+
+            // Toggle active nav button
+            document.getElementById('navCost').classList.toggle('active', page === 'cost');
+            document.getElementById('navOrder').classList.toggle('active', page === 'order');
+
+            // Load data for the newly selected page
+            loadData(page === 'cost' ? 'Cost Sheet' : 'OrderSheet');
+        }
+
+        function showDetails(index, type) {
+            const row = (type === 'cost' ? costData : orderData)[index];
+            const labels = (type === 'cost' ? costLabels : orderLabels);
             let bHtml = "";
             row.forEach((val, i) => { if(labels[i]) bHtml += `<div class="detail-row"><span>${labels[i]}</span><b>${val || '-'}</b></div>`; });
             document.getElementById('modalBody').innerHTML = bHtml;
+            document.getElementById('modalTitle').innerText = (type === 'cost' ? 'Full Details' : 'Full Order Details');
             document.getElementById('detailsModal').style.display = "block";
         }
 
-        function openOrderForm(designNo, rate) {
-            document.getElementById('orderDesignLabel').innerText = designNo;
-            document.getElementById('orderRate').value = rate;
-            document.getElementById('orderModal').style.display = "block";
-        }
-
-        async function saveOrder() {
-            const d = {
-                targetSheet: 'OrderSheet',
-                designNo: document.getElementById('orderDesignLabel').innerText,
-                partyName: document.getElementById('partyName').value,
-                sizeBreakdown: document.getElementById('sizeBreakdown').value,
-                qty: document.getElementById('orderQty').value,
-                rate: document.getElementById('orderRate').value,
-                targetDate: document.getElementById('targetDate').value
-            };
-            await fetch(mySheetUrl, { method: "POST", body: JSON.stringify(d) });
-            alert("Order sent to DG Order Sheet!");
-            closeModal('orderModal');
-            loadData();
-        }
-
-        async function deleteEntry(designNo) {
-            if(confirm("Delete Design " + designNo + " from the sheet?")) {
-                await fetch(mySheetUrl, { method: "POST", body: JSON.stringify({action: 'delete', designNo: designNo}) });
-                loadData();
-            }
-        }
-
-        function filterData() {
-            const term = document.getElementById('searchBar').value.toLowerCase();
-            renderCards(allData.filter(r => r[0].toString().toLowerCase().includes(term)));
-        }
-
         function closeModal(id) { document.getElementById(id).style.display = "none"; }
-        loadData();
+        function filterData(type) {
+            const term = document.getElementById(type === 'cost' ? 'searchCost' : 'searchOrder').value.toLowerCase();
+            const data = (type === 'cost' ? costData : orderData);
+            const renderFunc = (type === 'cost' ? renderCostCards : renderOrderCards);
+            const searchIndex = (type === 'cost' ? 0 : [1, 4]); // Searches Design on Cost Sheet, Party & Design on Order Sheet
+
+            renderFunc(data.filter(r => {
+                if(type === 'cost') return r[searchIndex].toString().toLowerCase().includes(term);
+                return (r[searchIndex[0]].toString().toLowerCase().includes(term) || r[searchIndex[1]].toString().toLowerCase().includes(term));
+            }));
+        }
+
+        // Helper: Formats Google Sheet date into something readable
+        function formatDate(dateString) {
+            if(!dateString) return '-';
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-IN', {day: '2-digit', month: 'short', year: 'numeric'});
+        }
+
+        // Initial Load
+        loadData('Cost Sheet');
     </script>
 </body>
 </html>
