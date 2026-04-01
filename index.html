@@ -4,201 +4,189 @@
     <title>Simona Pro</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-        body { font-family: 'Segoe UI', sans-serif; padding: 0 0 80px 0; background: #f8f9fa; color: #2c3e50; margin: 0; }
-        .header { text-align: center; padding: 20px 0; background: white; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .blessing { font-style: italic; color: #95a5a6; font-size: 0.8em; display: block; margin-bottom: 5px; }
-        h1 { margin: 0; font-size: 1.4em; }
-
-        /* Search Bar */
-        .search-container { padding: 0 15px; }
-        input[type="text"] { width: 100%; padding: 15px; margin-bottom: 20px; border-radius: 25px; border: 1px solid #dfe6e9; font-size: 16px; outline: none; box-sizing: border-box; }
-
-        /* Navigation Tabs */
-        .navbar { position: fixed; bottom: 0; left: 0; width: 100%; height: 65px; background: white; box-shadow: 0 -4px 15px rgba(0,0,0,0.1); display: flex; align-items: center; z-index: 500; }
-        .nav-btn { flex: 1; text-align: center; font-weight: bold; padding: 15px; color: #7f8c8d; cursor: pointer; }
-        .nav-btn.active { color: #d4a017; background: #fffcf5; border-top: 3px solid #d4a017; }
-
-        /* Page Logic */
-        .page { display: none; padding: 0 15px; }
-        .page.active { display: block; }
-
-        /* Card Styling */
-        .card { background: white; padding: 20px; margin-bottom: 15px; border-radius: 15px; border-left: 6px solid #d4a017; box-shadow: 0 4px 12px rgba(0,0,0,0.08); position: relative; }
-        .design-no { font-size: 1.2em; font-weight: bold; margin-bottom: 5px; }
-        .price { color: #27ae60; font-weight: 700; }
+        :root { --gold: #d4a017; --dark: #2c3e50; --green: #27ae60; --light: #f8f9fa; }
+        body { font-family: 'Segoe UI', sans-serif; margin: 0; background: var(--light); padding-bottom: 90px; }
         
-        /* Buttons */
-        .delete-btn { position: absolute; top: 15px; right: 15px; background: #ff7675; color: white; border: none; padding: 6px 10px; border-radius: 6px; font-size: 0.7em; font-weight: bold; }
-        .order-btn { position: absolute; top: 15px; right: 75px; background: #27ae60; color: white; border: none; padding: 6px 10px; border-radius: 6px; font-size: 0.7em; font-weight: bold; }
+        .header { text-align: center; padding: 20px; background: white; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .blessing { font-style: italic; color: #95a5a6; font-size: 0.8em; display: block; }
+        h1 { margin: 5px 0; color: var(--dark); font-size: 1.4em; }
 
-        /* Floating Plus Button */
-        .fab { position: fixed; bottom: 85px; right: 25px; width: 60px; height: 60px; background: #d4a017; color: white; border-radius: 50%; font-size: 30px; display: flex; align-items: center; justify-content: center; box-shadow: 0 5px 15px rgba(0,0,0,0.3); z-index: 400; cursor: pointer; }
+        .navbar { position: fixed; bottom: 0; width: 100%; height: 65px; background: white; display: flex; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); z-index: 1000; }
+        .nav-item { flex: 1; display: flex; align-items: center; justify-content: center; color: #7f8c8d; cursor: pointer; font-weight: bold; }
+        .nav-item.active { color: var(--gold); background: #fffcf5; border-top: 3px solid var(--gold); }
 
-        /* Modals */
-        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); overflow-y: auto; }
-        .modal-content { background: white; margin: 10% auto; padding: 25px; border-radius: 20px; width: 85%; max-width: 450px; }
-        .detail-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #eee; font-size: 0.9em; }
-        input[type="number"], input[type="date"], .modal input { width: 100%; padding: 12px; margin-bottom: 15px; border-radius: 8px; border: 1px solid #ddd; box-sizing: border-box; }
-        .save-btn { width: 100%; padding: 15px; background: #27ae60; color: white; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; }
+        .container { padding: 15px; }
+        .page { display: none; }
+        .page.active { display: block; }
+        
+        .search-box { width: 100%; padding: 15px; margin-bottom: 20px; border-radius: 25px; border: 1px solid #ddd; outline: none; box-sizing: border-box; font-size: 1rem; }
+
+        .card { background: white; border-radius: 15px; padding: 20px; margin-bottom: 15px; position: relative; border-left: 6px solid var(--gold); box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .card h3 { margin: 0 0 5px 0; font-size: 1.2rem; }
+        .price-tag { color: var(--green); font-weight: bold; }
+
+        .btn-delete { position: absolute; top: 15px; right: 15px; background: #ff7675; color: white; border: none; border-radius: 6px; padding: 6px 12px; font-weight: bold; cursor: pointer; font-size: 0.7em; }
+        
+        /* New Order Button in Order Page */
+        .new-order-trigger { width: 100%; padding: 15px; background: var(--green); color: white; border: none; border-radius: 12px; font-weight: bold; margin-bottom: 20px; cursor: pointer; }
+
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; overflow-y: auto; }
+        .modal-content { background: white; width: 90%; max-width: 400px; margin: 40px auto; padding: 25px; border-radius: 20px; box-sizing: border-box; }
+        .modal-content input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
+        .submit-btn { width: 100%; padding: 15px; background: var(--green); color: white; border: none; border-radius: 10px; font-weight: bold; margin-top: 10px; cursor: pointer; }
+        
+        .detail-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #eee; font-size: 0.9rem; }
     </style>
 </head>
 <body>
 
     <div class="header">
         <span class="blessing">"SHREE"</span>
-        <h1 id="pageTitle">Simona Design List</h1>
+        <h1 id="title">Simona Design List</h1>
     </div>
 
-    <div id="costPage" class="page active">
-        <div class="search-container"><input type="text" id="searchCost" placeholder="Search Design No..." onkeyup="filterData('cost')"></div>
-        <div id="costDisplay">Loading Cost Sheet...</div>
-    </div>
+    <div class="container">
+        <div id="costPage" class="page active">
+            <input type="text" class="search-box" placeholder="Search Design No..." onkeyup="filterData('cost')">
+            <div id="costList">Loading...</div>
+        </div>
 
-    <div id="orderPage" class="page">
-        <div class="search-container"><input type="text" id="searchOrder" placeholder="Search Party or Design..." onkeyup="filterData('order')"></div>
-        <div id="orderDisplay">Loading Order Sheet...</div>
+        <div id="orderPage" class="page">
+            <button class="new-order-trigger" onclick="openOrderForm()">+ Create New Order</button>
+            <input type="text" class="search-box" placeholder="Search Party or Design..." onkeyup="filterData('order')">
+            <div id="orderList">Loading...</div>
+        </div>
     </div>
-
-    <div class="fab" onclick="handleFabClick()">+</div>
 
     <div class="navbar">
-        <div class="nav-btn active" id="navCost" onclick="switchPage('cost')">Cost Sheet</div>
-        <div class="nav-btn" id="navOrder" onclick="switchPage('order')">Order Sheet</div>
+        <div class="nav-item active" id="navCost" onclick="switchPage('cost')">Cost Sheet</div>
+        <div class="nav-item" id="navOrder" onclick="switchPage('order')">Order Sheet</div>
     </div>
 
     <div id="orderModal" class="modal">
         <div class="modal-content">
-            <h2 style="color:#27ae60; margin-top:0">New Order: <span id="orderDesignLabel"></span></h2>
-            <input type="text" id="partyName" placeholder="Party Name">
-            <input type="text" id="sizeBreakdown" placeholder="Sizes (e.g. 2-L, 4-XL)">
-            <input type="number" id="orderQty" placeholder="Quantity">
-            <input type="number" id="orderRate" placeholder="Rate">
-            <input type="date" id="targetDate">
-            <button class="save-btn" onclick="saveOrder()">Confirm Order</button>
-            <button onclick="closeModal('orderModal')" style="width:100%; background:none; border:none; color:red; margin-top:10px; cursor:pointer">Cancel</button>
+            <h2 style="margin-top:0; color:var(--green)">New Order Details</h2>
+            <input type="text" id="order_design" placeholder="Design No. (e.g. 101)">
+            <input type="text" id="party" placeholder="Party Name">
+            <input type="text" id="sizes" placeholder="Size Breakdown (e.g. 2-L, 4-XL)">
+            <input type="number" id="qty" placeholder="Total Quantity">
+            <input type="number" id="rate" placeholder="Party Rate (Price)">
+            <label style="font-size: 0.8em; color: #666; margin-left: 5px;">Delivery Deadline:</label>
+            <input type="date" id="deadline">
+            <button class="submit-btn" onclick="submitOrder()">Save Order to Sheet</button>
+            <button onclick="closeModal('orderModal')" style="width:100%; background:none; border:none; color:red; margin-top:10px; cursor:pointer;">Close</button>
         </div>
     </div>
 
     <div id="detailsModal" class="modal">
         <div class="modal-content">
-            <span onclick="closeModal('detailsModal')" style="float:right; font-size:28px; cursor:pointer">&times;</span>
-            <h2 id="modalTitle" style="color:#d4a017; margin-top:0">Details</h2>
-            <div id="modalBody"></div>
+            <h2 id="detTitle" style="margin-top:0; color:var(--gold)">Details</h2>
+            <div id="detBody"></div>
+            <button class="submit-btn" style="background:var(--dark)" onclick="closeModal('detailsModal')">Close</button>
         </div>
     </div>
 
     <script>
-        const mySheetUrl = "https://script.google.com/macros/s/AKfycbwEBqCAfPMsIRqaWBpkSQwM6LP_VdcugvX9OLC9o75peTgvKaN5Xc8KWU0DE10FNg8P/exec"; 
-        
+        const mySheetUrl = "https://script.google.com/macros/s/AKfycbwEBqCAfPMsIRqaWBpkSQwM6LP_VdcugvX9OLC9o75peTgvKaN5Xc8KWU0DE10FNg8P/exec";
+
         let costData = [];
         let orderData = [];
-        const costLabels = ["Design No", "F1 Name", "F1 Qty", "F1 Rate", "F2 Name", "F2 Qty", "F2 Rate", "F3 Name", "F3 Qty", "F3 Rate", "F4 Name", "F4 Qty", "F4 Rate", "F5 Name", "F5 Qty", "F5 Rate", "F6 Name", "F6 Qty", "F6 Rate", "Total Fabric", "Dye Cost", "Handwork", "Stitching", "Packing", "Total Cost", "Wholesale Rate", "Total Profit"];
-        const orderLabels = ["SI No", "Party Name", "Order Date", "Target Date", "Design No", "Quantity", "Size Breakdown", "Rate", "Total Value", "Delivery Date", "Qty Delivered", "Invoice", "Pending", "Status"];
+        const cLabels = ["Design No", "F1 Name", "F1 Qty", "F1 Rate", "F2 Name", "F2 Qty", "F2 Rate", "F3 Name", "F3 Qty", "F3 Rate", "F4 Name", "F4 Qty", "F4 Rate", "F5 Name", "F5 Qty", "F5 Rate", "F6 Name", "F6 Qty", "F6 Rate", "Total Fabric", "Dye Cost", "Handwork", "Stitching", "Packing", "Total Cost", "Wholesale Rate", "Total Profit"];
+        const oLabels = ["SI No", "Party Name", "Date", "Deadline", "Design", "Qty", "Sizes", "Rate", "Total", "Delivered Date", "Delivered Qty", "Invoice", "Pending", "Status"];
 
-        async function loadData(sheet) {
-            const container = (sheet === "Cost Sheet" ? 'costDisplay' : 'orderDisplay');
+        async function load(sheet) {
             try {
-                const res = await fetch(mySheetUrl + "?sheet=" + encodeURIComponent(sheet));
-                const data = await res.json();
-                if (sheet === "Cost Sheet") { costData = data; renderCostCards(data); } 
-                else { orderData = data; renderOrderCards(data); }
-            } catch(e) { document.getElementById(container).innerHTML = "Error loading data."; }
+                const res = await fetch(`${mySheetUrl}?sheet=${encodeURIComponent(sheet)}`);
+                const json = await res.json();
+                if(sheet === "Cost Sheet") { costData = json; renderCost(json); }
+                else { orderData = json; renderOrder(json); }
+            } catch(e) { console.log("Load Error"); }
         }
 
-        function renderCostCards(data) {
-            let html = "";
-            data.forEach((row, index) => {
-                if(row[0]) {
-                    html += `<div class="card" onclick="showDetails(${index}, 'cost')">
-                        <button class="delete-btn" onclick="event.stopPropagation(); deleteEntry('${row[0]}')">Delete</button>
-                        <button class="order-btn" onclick="event.stopPropagation(); openOrderForm('${row[0]}', '${row[25]}')">Order</button>
-                        <div class="design-no">${row[0]}</div>
-                        <div class="price">Wholesale: ₹${row[25] || '0'}</div>
-                        <small style="color:#d4a017">Tap for breakdown →</small>
+        function renderCost(data) {
+            let h = "";
+            data.forEach((r, i) => {
+                if(r[0]) {
+                    h += `<div class="card" onclick="viewDet(${i}, 'cost')">
+                        <button class="btn-delete" onclick="event.stopPropagation(); del('${r[0]}')">Delete</button>
+                        <h3>${r[0]}</h3>
+                        <div class="price-tag">Wholesale: ₹${r[25] || '0'}</div>
                     </div>`;
                 }
             });
-            document.getElementById('costDisplay').innerHTML = html;
+            document.getElementById('costList').innerHTML = h;
         }
 
-        function renderOrderCards(data) {
-            let html = "";
-            data.forEach((row, index) => {
-                if(row[0]) {
-                    html += `<div class="card" onclick="showDetails(${index}, 'order')">
-                        <div class="design-no">${row[1]} <span style="font-size:0.7em; color:#7f8c8d">(${row[4]})</span></div>
-                        <div style="font-weight:600">Qty: ${row[5]} | ₹${row[7]}</div>
-                        <div style="font-size:0.8em; color:#95a5a6">Order Date: ${formatDate(row[2])}</div>
-                        <small style="color:#d4a017">Tap for more details →</small>
+        function renderOrder(data) {
+            let h = "";
+            data.forEach((r, i) => {
+                if(r[1]) {
+                    h += `<div class="card" onclick="viewDet(${i}, 'order')">
+                        <h3>${r[1]}</h3>
+                        <p>Design: <b>${r[4]}</b> | Total: ₹${r[8] || '0'}</p>
+                        <p style="font-size:0.8em">Date: ${formatDate(r[2])}</p>
                     </div>`;
                 }
             });
-            document.getElementById('orderDisplay').innerHTML = html;
+            document.getElementById('orderList').innerHTML = h || "No orders found.";
         }
 
-        function switchPage(page) {
-            document.getElementById('pageTitle').innerText = (page === 'cost' ? 'Simona Design List' : 'Simona Order List');
-            document.getElementById('costPage').classList.toggle('active', page === 'cost');
-            document.getElementById('orderPage').classList.toggle('active', page === 'order');
-            document.getElementById('navCost').classList.toggle('active', page === 'cost');
-            document.getElementById('navOrder').classList.toggle('active', page === 'order');
-            loadData(page === 'cost' ? 'Cost Sheet' : 'OrderSheet');
+        function switchPage(p) {
+            document.getElementById('costPage').classList.toggle('active', p === 'cost');
+            document.getElementById('orderPage').classList.toggle('active', p === 'order');
+            document.getElementById('navCost').classList.toggle('active', p === 'cost');
+            document.getElementById('navOrder').classList.toggle('active', p === 'order');
+            document.getElementById('title').innerText = p === 'cost' ? 'Simona Design List' : 'Simona Order List';
+            load(p === 'cost' ? 'Cost Sheet' : 'OrderSheet');
         }
 
-        function handleFabClick() {
-            const isCost = document.getElementById('costPage').classList.contains('active');
-            if(isCost) { switchPage('order'); } 
-            else { switchPage('cost'); }
-        }
+        function openOrderForm() { document.getElementById('orderModal').style.display = 'block'; }
 
-        function openOrderForm(designNo, rate) {
-            document.getElementById('orderDesignLabel').innerText = designNo;
-            document.getElementById('orderRate').value = rate;
-            document.getElementById('orderModal').style.display = "block";
-        }
-
-        async function saveOrder() {
-            const payload = {
+        async function submitOrder() {
+            const d = {
                 targetSheet: 'OrderSheet',
-                designNo: document.getElementById('orderDesignLabel').innerText,
-                partyName: document.getElementById('partyName').value,
-                sizeBreakdown: document.getElementById('sizeBreakdown').value,
-                qty: document.getElementById('orderQty').value,
-                rate: document.getElementById('orderRate').value,
-                targetDate: document.getElementById('targetDate').value
+                designNo: document.getElementById('order_design').value,
+                partyName: document.getElementById('party').value,
+                sizeBreakdown: document.getElementById('sizes').value,
+                qty: document.getElementById('qty').value,
+                rate: document.getElementById('rate').value,
+                targetDate: document.getElementById('deadline').value
             };
-            await fetch(mySheetUrl, { method: "POST", body: JSON.stringify(payload) });
-            alert("Order Saved!");
+            await fetch(mySheetUrl, { method: 'POST', body: JSON.stringify(d) });
+            alert("Order Placed Successfully!");
             closeModal('orderModal');
-            switchPage('order');
+            load('OrderSheet');
         }
 
-        function showDetails(index, type) {
-            const row = (type === 'cost' ? costData : orderData)[index];
-            const labels = (type === 'cost' ? costLabels : orderLabels);
-            let bHtml = "";
-            row.forEach((val, i) => { if(labels[i]) bHtml += `<div class="detail-row"><span>${labels[i]}</span><b>${val || '-'}</b></div>`; });
-            document.getElementById('modalBody').innerHTML = bHtml;
-            document.getElementById('detailsModal').style.display = "block";
+        function viewDet(idx, type) {
+            const dataSet = (type === 'cost' ? costData : orderData);
+            const r = dataSet[idx];
+            const l = (type === 'cost' ? cLabels : oLabels);
+            let h = "";
+            r.forEach((v, i) => { if(l[i]) h += `<div class="detail-row"><span>${l[i]}</span><b>${v || '-'}</b></div>`; });
+            document.getElementById('detBody').innerHTML = h;
+            document.getElementById('detTitle').innerText = type === 'cost' ? 'Design Details' : 'Order Details';
+            document.getElementById('detailsModal').style.display = 'block';
         }
 
-        async function deleteEntry(designNo) {
-            if(confirm("Delete Design " + designNo + "?")) {
-                await fetch(mySheetUrl, { method: "POST", body: JSON.stringify({action: 'delete', designNo: designNo}) });
-                loadData('Cost Sheet');
+        async function del(no) {
+            if(confirm("Delete Design " + no + "?")) {
+                await fetch(mySheetUrl, { method: 'POST', body: JSON.stringify({action: 'delete', designNo: no}) });
+                load('Cost Sheet');
             }
         }
 
         function filterData(type) {
-            const term = document.getElementById(type === 'cost' ? 'searchCost' : 'searchOrder').value.toLowerCase();
-            const data = (type === 'cost' ? costData : orderData);
-            const filtered = data.filter(r => r.some(cell => cell.toString().toLowerCase().includes(term)));
-            type === 'cost' ? renderCostCards(filtered) : renderOrderCards(filtered);
+            const q = document.getElementById(type === 'cost' ? 'searchCost' : 'searchOrder').value.toLowerCase();
+            const source = (type === 'cost' ? costData : orderData);
+            const filtered = source.filter(r => r.some(c => c.toString().toLowerCase().includes(q)));
+            type === 'cost' ? renderCost(filtered) : renderOrder(filtered);
         }
 
         function formatDate(d) { return d ? new Date(d).toLocaleDateString('en-IN') : '-'; }
-        function closeModal(id) { document.getElementById(id).style.display = "none"; }
-        loadData('Cost Sheet');
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+        
+        load('Cost Sheet');
     </script>
 </body>
 </html>
