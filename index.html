@@ -4,44 +4,42 @@
     <title>Simona Pro</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-        body { font-family: 'Segoe UI', sans-serif; padding: 15px 15px 80px 15px; background: #f8f9fa; color: #2c3e50; margin: 0; }
+        body { font-family: 'Segoe UI', sans-serif; padding: 0 0 80px 0; background: #f8f9fa; color: #2c3e50; margin: 0; }
         .header { text-align: center; padding: 20px 0; background: white; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
         .blessing { font-style: italic; color: #95a5a6; font-size: 0.8em; display: block; margin-bottom: 5px; }
-        h1 { margin: 0; font-size: 1.5em; }
+        h1 { margin: 0; font-size: 1.4em; }
 
         /* Search Bar */
-        .search-container { padding: 0 10px; }
+        .search-container { padding: 0 15px; }
         input[type="text"] { width: 100%; padding: 15px; margin-bottom: 20px; border-radius: 25px; border: 1px solid #dfe6e9; font-size: 16px; outline: none; box-sizing: border-box; }
 
-        /* Navigation Tabs (Bottom) */
+        /* Navigation Tabs */
         .navbar { position: fixed; bottom: 0; left: 0; width: 100%; height: 65px; background: white; box-shadow: 0 -4px 15px rgba(0,0,0,0.1); display: flex; align-items: center; z-index: 500; }
-        .nav-btn { flex: 1; text-align: center; font-weight: bold; padding: 15px; color: #7f8c8d; cursor: pointer; transition: 0.3s; }
+        .nav-btn { flex: 1; text-align: center; font-weight: bold; padding: 15px; color: #7f8c8d; cursor: pointer; }
         .nav-btn.active { color: #d4a017; background: #fffcf5; border-top: 3px solid #d4a017; }
 
-        /* Page Display Logic */
-        .page { display: none; padding: 0 10px; }
+        /* Page Logic */
+        .page { display: none; padding: 0 15px; }
         .page.active { display: block; }
 
         /* Card Styling */
         .card { background: white; padding: 20px; margin-bottom: 15px; border-radius: 15px; border-left: 6px solid #d4a017; box-shadow: 0 4px 12px rgba(0,0,0,0.08); position: relative; }
-        .design-no { font-size: 1.3em; font-weight: bold; margin-bottom: 5px; }
-        .price { color: #27ae60; font-weight: 700; font-size: 1.1em; }
-        .tap-hint { color: #d4a017; font-size: 0.85em; margin-top: 10px; display: block; }
+        .design-no { font-size: 1.2em; font-weight: bold; margin-bottom: 5px; }
+        .price { color: #27ae60; font-weight: 700; }
+        
+        /* Buttons */
+        .delete-btn { position: absolute; top: 15px; right: 15px; background: #ff7675; color: white; border: none; padding: 6px 10px; border-radius: 6px; font-size: 0.7em; font-weight: bold; }
+        .order-btn { position: absolute; top: 15px; right: 75px; background: #27ae60; color: white; border: none; padding: 6px 10px; border-radius: 6px; font-size: 0.7em; font-weight: bold; }
 
-        /* Action Buttons */
-        .delete-btn { position: absolute; top: 15px; right: 15px; background: #ff7675; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-weight: bold; cursor: pointer; }
-        .order-btn { position: absolute; top: 15px; right: 85px; background: #27ae60; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-weight: bold; cursor: pointer; }
-
-        /* FAB (Plus Button) */
-        .fab { position: fixed; bottom: 85px; right: 25px; width: 65px; height: 65px; background: #d4a017; color: white; border-radius: 50%; font-size: 35px; display: flex; align-items: center; justify-content: center; box-shadow: 0 5px 15px rgba(0,0,0,0.3); z-index: 400; cursor: pointer; }
+        /* Floating Plus Button */
+        .fab { position: fixed; bottom: 85px; right: 25px; width: 60px; height: 60px; background: #d4a017; color: white; border-radius: 50%; font-size: 30px; display: flex; align-items: center; justify-content: center; box-shadow: 0 5px 15px rgba(0,0,0,0.3); z-index: 400; cursor: pointer; }
 
         /* Modals */
-        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); }
-        .modal-content { background: white; margin: 10% auto; padding: 25px; border-radius: 20px; width: 85%; max-width: 450px; position: relative; }
-        .modal-body { max-height: 70vh; overflow-y: auto; }
-        .detail-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #eee; }
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); overflow-y: auto; }
+        .modal-content { background: white; margin: 10% auto; padding: 25px; border-radius: 20px; width: 85%; max-width: 450px; }
+        .detail-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #eee; font-size: 0.9em; }
         input[type="number"], input[type="date"], .modal input { width: 100%; padding: 12px; margin-bottom: 15px; border-radius: 8px; border: 1px solid #ddd; box-sizing: border-box; }
-        .save-btn { width: 100%; padding: 15px; background: #27ae60; color: white; border: none; border-radius: 10px; font-weight: bold; font-size: 1.1em; cursor: pointer; }
+        .save-btn { width: 100%; padding: 15px; background: #27ae60; color: white; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -52,17 +50,13 @@
     </div>
 
     <div id="costPage" class="page active">
-        <div class="search-container">
-            <input type="text" id="searchCost" placeholder="Search Design No..." onkeyup="filterData('cost')">
-        </div>
-        <div id="costDisplay">Loading Designs...</div>
+        <div class="search-container"><input type="text" id="searchCost" placeholder="Search Design No..." onkeyup="filterData('cost')"></div>
+        <div id="costDisplay">Loading Cost Sheet...</div>
     </div>
 
     <div id="orderPage" class="page">
-        <div class="search-container">
-            <input type="text" id="searchOrder" placeholder="Search Party or Design..." onkeyup="filterData('order')">
-        </div>
-        <div id="orderDisplay">Loading Orders...</div>
+        <div class="search-container"><input type="text" id="searchOrder" placeholder="Search Party or Design..." onkeyup="filterData('order')"></div>
+        <div id="orderDisplay">Loading Order Sheet...</div>
     </div>
 
     <div class="fab" onclick="handleFabClick()">+</div>
@@ -76,86 +70,72 @@
         <div class="modal-content">
             <h2 style="color:#27ae60; margin-top:0">New Order: <span id="orderDesignLabel"></span></h2>
             <input type="text" id="partyName" placeholder="Party Name">
-            <input type="text" id="sizeBreakdown" placeholder="Sizes (e.g., 2-L, 4-XL)">
-            <input type="number" id="orderQty" placeholder="Total Quantity">
-            <input type="number" id="orderRate" placeholder="Rate / Piece">
-            <label style="font-size: 0.8em; color: #666;">Delivery Date:</label>
+            <input type="text" id="sizeBreakdown" placeholder="Sizes (e.g. 2-L, 4-XL)">
+            <input type="number" id="orderQty" placeholder="Quantity">
+            <input type="number" id="orderRate" placeholder="Rate">
             <input type="date" id="targetDate">
-            <button class="save-btn" onclick="saveOrder()">Submit Order</button>
-            <button onclick="closeModal('orderModal')" style="width:100%; background:none; border:none; color:red; margin-top:15px; cursor:pointer; font-weight:bold">Cancel</button>
+            <button class="save-btn" onclick="saveOrder()">Confirm Order</button>
+            <button onclick="closeModal('orderModal')" style="width:100%; background:none; border:none; color:red; margin-top:10px; cursor:pointer">Cancel</button>
         </div>
     </div>
 
     <div id="detailsModal" class="modal">
         <div class="modal-content">
-            <span onclick="closeModal('detailsModal')" style="float:right; font-size:30px; cursor:pointer">&times;</span>
+            <span onclick="closeModal('detailsModal')" style="float:right; font-size:28px; cursor:pointer">&times;</span>
             <h2 id="modalTitle" style="color:#d4a017; margin-top:0">Details</h2>
-            <div id="modalBody" class="modal-body"></div>
+            <div id="modalBody"></div>
         </div>
     </div>
 
     <script>
-        // --- 1. SETTINGS ---
-        const mySheetUrl = "https://script.google.com/macros/s/AKfycbyMCuAgaFZzPUf9L15qpJ_qXQjXZSu3F9ZuAzikM0SHAvjOIVSEYem9cFZd8gehQIdK0A/exec"; 
+        const mySheetUrl = "https://script.google.com/macros/s/AKfycbwEBqCAfPMsIRqaWBpkSQwM6LP_VdcugvX9OLC9o75peTgvKaN5Xc8KWU0DE10FNg8P/exec"; 
         
         let costData = [];
         let orderData = [];
         const costLabels = ["Design No", "F1 Name", "F1 Qty", "F1 Rate", "F2 Name", "F2 Qty", "F2 Rate", "F3 Name", "F3 Qty", "F3 Rate", "F4 Name", "F4 Qty", "F4 Rate", "F5 Name", "F5 Qty", "F5 Rate", "F6 Name", "F6 Qty", "F6 Rate", "Total Fabric", "Dye Cost", "Handwork", "Stitching", "Packing", "Total Cost", "Wholesale Rate", "Total Profit"];
         const orderLabels = ["SI No", "Party Name", "Order Date", "Target Date", "Design No", "Quantity", "Size Breakdown", "Rate", "Total Value", "Delivery Date", "Qty Delivered", "Invoice", "Pending", "Status"];
 
-        // --- 2. DATA LOADING ---
         async function loadData(sheet) {
-            const containerId = (sheet === "Cost Sheet" ? 'costDisplay' : 'orderDisplay');
-            document.getElementById(containerId).innerHTML = "Refreshing data...";
-            
+            const container = (sheet === "Cost Sheet" ? 'costDisplay' : 'orderDisplay');
             try {
                 const res = await fetch(mySheetUrl + "?sheet=" + encodeURIComponent(sheet));
                 const data = await res.json();
-                if (sheet === "Cost Sheet") {
-                    costData = data;
-                    renderCostCards(costData);
-                } else {
-                    orderData = data;
-                    renderOrderCards(orderData);
-                }
-            } catch(e) { document.getElementById(containerId).innerHTML = "Error loading data. Please check connection."; }
+                if (sheet === "Cost Sheet") { costData = data; renderCostCards(data); } 
+                else { orderData = data; renderOrderCards(data); }
+            } catch(e) { document.getElementById(container).innerHTML = "Error loading data."; }
         }
 
-        // --- 3. RENDERING ---
         function renderCostCards(data) {
             let html = "";
             data.forEach((row, index) => {
                 if(row[0]) {
-                    html += `
-                    <div class="card" onclick="showDetails(${index}, 'cost')">
+                    html += `<div class="card" onclick="showDetails(${index}, 'cost')">
                         <button class="delete-btn" onclick="event.stopPropagation(); deleteEntry('${row[0]}')">Delete</button>
                         <button class="order-btn" onclick="event.stopPropagation(); openOrderForm('${row[0]}', '${row[25]}')">Order</button>
                         <div class="design-no">${row[0]}</div>
                         <div class="price">Wholesale: ₹${row[25] || '0'}</div>
-                        <span class="tap-hint">Tap for full breakdown →</span>
+                        <small style="color:#d4a017">Tap for breakdown →</small>
                     </div>`;
                 }
             });
-            document.getElementById('costDisplay').innerHTML = html || "No designs found.";
+            document.getElementById('costDisplay').innerHTML = html;
         }
 
         function renderOrderCards(data) {
             let html = "";
             data.forEach((row, index) => {
                 if(row[0]) {
-                    html += `
-                    <div class="card" onclick="showDetails(${index}, 'order')">
-                        <div class="design-no" style="color:#2c3e50">${row[1]} <span style="font-size:0.7em; color:#7f8c8d">(${row[4]})</span></div>
+                    html += `<div class="card" onclick="showDetails(${index}, 'order')">
+                        <div class="design-no">${row[1]} <span style="font-size:0.7em; color:#7f8c8d">(${row[4]})</span></div>
                         <div style="font-weight:600">Qty: ${row[5]} | ₹${row[7]}</div>
-                        <div style="font-size:0.85em; color:#95a5a6; margin-top:5px">Ordered: ${formatDate(row[2])}</div>
-                        <span class="tap-hint">Tap for more details →</span>
+                        <div style="font-size:0.8em; color:#95a5a6">Order Date: ${formatDate(row[2])}</div>
+                        <small style="color:#d4a017">Tap for more details →</small>
                     </div>`;
                 }
             });
-            document.getElementById('orderDisplay').innerHTML = html || "No orders found.";
+            document.getElementById('orderDisplay').innerHTML = html;
         }
 
-        // --- 4. NAVIGATION & UI ---
         function switchPage(page) {
             document.getElementById('pageTitle').innerText = (page === 'cost' ? 'Simona Design List' : 'Simona Order List');
             document.getElementById('costPage').classList.toggle('active', page === 'cost');
@@ -167,11 +147,8 @@
 
         function handleFabClick() {
             const isCost = document.getElementById('costPage').classList.contains('active');
-            if(isCost) {
-                alert("Please add new designs directly into the Google Sheet for now.");
-            } else {
-                alert("To place a new order, find the design on the 'Cost Sheet' and click the green 'Order' button.");
-            }
+            if(isCost) { switchPage('order'); } 
+            else { switchPage('cost'); }
         }
 
         function openOrderForm(designNo, rate) {
@@ -190,9 +167,8 @@
                 rate: document.getElementById('orderRate').value,
                 targetDate: document.getElementById('targetDate').value
             };
-            
             await fetch(mySheetUrl, { method: "POST", body: JSON.stringify(payload) });
-            alert("Order Success!");
+            alert("Order Saved!");
             closeModal('orderModal');
             switchPage('order');
         }
@@ -203,12 +179,11 @@
             let bHtml = "";
             row.forEach((val, i) => { if(labels[i]) bHtml += `<div class="detail-row"><span>${labels[i]}</span><b>${val || '-'}</b></div>`; });
             document.getElementById('modalBody').innerHTML = bHtml;
-            document.getElementById('modalTitle').innerText = (type === 'cost' ? 'Design Breakdown' : 'Order Details');
             document.getElementById('detailsModal').style.display = "block";
         }
 
         async function deleteEntry(designNo) {
-            if(confirm("Delete " + designNo + "?")) {
+            if(confirm("Delete Design " + designNo + "?")) {
                 await fetch(mySheetUrl, { method: "POST", body: JSON.stringify({action: 'delete', designNo: designNo}) });
                 loadData('Cost Sheet');
             }
@@ -223,8 +198,6 @@
 
         function formatDate(d) { return d ? new Date(d).toLocaleDateString('en-IN') : '-'; }
         function closeModal(id) { document.getElementById(id).style.display = "none"; }
-
-        // Load Cost Sheet by default
         loadData('Cost Sheet');
     </script>
 </body>
