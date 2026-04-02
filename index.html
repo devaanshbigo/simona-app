@@ -50,12 +50,12 @@
 
     <div class="header">
         <span class="blessing">"SHREE"</span>
-        <h1 id="pageTitle">Simona Design List</h1>
+        <h1 id="pageTitle">SIMONA</h1>
     </div>
 
     <div class="container">
         <div id="costPage" class="page active">
-            <button class="top-btn" style="background:var(--dark)" onclick="openM('costModal')">+ Design Calculator</button>
+            <button class="top-btn" style="background:var(--dark)" onclick="openM('costModal')">+ Add New Design</button>
             <input type="text" class="search-box" id="searchCost" placeholder="Search Design No..." onkeyup="filterData('cost')">
             <div id="costList">Loading Designs...</div>
         </div>
@@ -163,6 +163,7 @@
 
         function getStatusClass(s) {
             if(!s) return "";
+             if(s.includes("pending")) return "status-pending";
             if(s.includes("Dye")) return "status-dye";
             if(s.includes("Handwork")) return "status-handwork";
             if(s.includes("Stitching")) return "status-stitching";
