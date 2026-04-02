@@ -4,216 +4,210 @@
     <title>Simona Management Pro</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-        :root { --gold: #d4a017; --dark: #2c3e50; --green: #27ae60; --light: #f8f9fa; --red: #ff7675; --blue: #3498db; --purple: #9b59b6; --orange: #e67e22; }
-        body { font-family: 'Segoe UI', sans-serif; margin: 0; background: var(--light); padding-bottom: 90px; }
-        .header { text-align: center; padding: 20px; background: white; border-bottom: 1px solid #eee; }
-        .blessing { font-style: italic; color: #95a5a6; font-size: 0.8em; display: block; }
-        h1 { margin: 5px 0; color: var(--dark); font-size: 1.3em; text-transform: uppercase; }
+        :root { --gold: #c5a059; --dark: #1a1a1a; --green: #27ae60; --red: #e74c3c; --blue: #3498db; --purple: #9b59b6; --orange: #e67e22; --light: #f4f7f6; }
+        body { font-family: -apple-system, sans-serif; margin: 0; background: var(--light); padding-bottom: 100px; }
+        
+        .header { background: white; padding: 20px; text-align: center; border-bottom: 1px solid #ddd; position: sticky; top: 0; z-index: 100; }
+        .blessing { font-size: 0.7rem; color: #999; letter-spacing: 3px; display: block; margin-bottom: 5px; }
+        h1 { margin: 0; font-size: 1.2rem; text-transform: uppercase; color: var(--dark); }
 
-        .navbar { position: fixed; bottom: 0; width: 100%; height: 65px; background: white; display: flex; border-top: 1px solid #ddd; z-index: 1000; }
-        .nav-item { flex: 1; display: flex; align-items: center; justify-content: center; color: #7f8c8d; cursor: pointer; font-weight: bold; text-transform: uppercase; font-size: 0.85rem; }
-        .nav-item.active { color: var(--gold); border-top: 3px solid var(--gold); background: #fdfaf4; }
+        .navbar { position: fixed; bottom: 0; width: 100%; height: 70px; background: white; display: flex; border-top: 1px solid #ddd; box-shadow: 0 -2px 10px rgba(0,0,0,0.05); }
+        .nav-item { flex: 1; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: bold; color: #888; text-transform: uppercase; cursor: pointer; }
+        .nav-item.active { color: var(--gold); border-top: 3px solid var(--gold); }
 
-        .container { padding: 15px; }
+        .container { padding: 15px; max-width: 600px; margin: auto; }
         .page { display: none; }
         .page.active { display: block; }
 
-        .search-box { width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 8px; border: 1px solid #ddd; box-sizing: border-box; font-size: 1rem; }
-        .top-btn { width: 100%; padding: 15px; color: white; border: none; border-radius: 10px; font-weight: bold; margin-bottom: 15px; cursor: pointer; text-transform: uppercase; }
+        .search-bar { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; font-size: 1rem; }
+        .main-btn { width: 100%; padding: 15px; border: none; border-radius: 10px; color: white; font-weight: bold; text-transform: uppercase; margin-bottom: 20px; cursor: pointer; }
 
-        .card { background: white; border-radius: 12px; padding: 18px; margin-bottom: 12px; border-left: 6px solid var(--gold); box-shadow: 0 4px 6px rgba(0,0,0,0.05); position: relative; cursor: pointer; }
-        .card.status-dyeing { background: #eef7ff; border-left-color: var(--blue); }
-        .card.status-handwork { background: #f9f0ff; border-left-color: var(--purple); }
-        .card.status-stitching { background: #fff5eb; border-left-color: var(--orange); }
-        .card.status-ready { background: #fffde0; border-left-color: #f1c40f; }
-        .card.status-delivered { background: #f0fff4; border-left-color: var(--green); }
+        /* CARDS */
+        .card { background: white; border-radius: 12px; padding: 15px; margin-bottom: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border-left: 6px solid var(--gold); position: relative; }
+        .card h3 { margin: 0 0 10px 0; font-size: 1.1rem; }
+        .card p { margin: 5px 0; font-size: 0.9rem; color: #555; }
+        
+        .card.status-dyeing { border-left-color: var(--blue); background: #f0f7ff; }
+        .card.status-handwork { border-left-color: var(--purple); background: #f9f0ff; }
+        .card.status-stitching { border-left-color: var(--orange); background: #fff8f0; }
+        .card.status-ready { border-left-color: #f1c40f; background: #fffdf2; }
+        .card.status-delivered { border-left-color: var(--green); background: #f0fff4; }
 
-        .btn-del { position: absolute; top: 15px; right: 15px; background: var(--red); color: white; border: none; border-radius: 5px; padding: 5px 10px; font-size: 0.7rem; cursor: pointer; z-index: 10; }
-        .status-group { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 12px; padding-top: 10px; border-top: 1px dashed #ddd; }
-        .s-btn { flex: 1; padding: 8px 2px; font-size: 0.65rem; border: none; border-radius: 4px; color: white; cursor: pointer; font-weight: bold; }
+        .del-btn { position: absolute; top: 15px; right: 15px; background: var(--red); color: white; border: none; border-radius: 4px; padding: 4px 8px; font-size: 0.7rem; cursor: pointer; }
+        
+        .status-tray { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 15px; padding-top: 10px; border-top: 1px dashed #ddd; }
+        .tray-btn { flex: 1; padding: 8px 2px; font-size: 0.6rem; border: none; border-radius: 4px; color: white; font-weight: bold; cursor: pointer; }
 
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.75); z-index: 2000; overflow-y: auto; }
-        .modal-body { background: white; width: 92%; max-width: 500px; margin: 20px auto; padding: 25px; border-radius: 12px; }
-        .calc-row { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 8px; margin-bottom: 8px; }
-        .sum-box { background: #f8fafb; padding: 15px; border-radius: 8px; margin-top: 15px; border: 1px solid #eee; }
+        /* MODALS */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; overflow-y: auto; }
+        .modal-content { background: white; width: 92%; max-width: 450px; margin: 30px auto; padding: 20px; border-radius: 15px; }
+        .calc-grid { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 8px; margin-bottom: 10px; }
+        .sum-box { background: #f9f9f9; padding: 15px; border-radius: 10px; margin-top: 15px; border: 1px solid #eee; }
         .sum-line { display: flex; justify-content: space-between; margin-bottom: 5px; font-weight: bold; }
-        .detail-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #eee; font-size: 0.9rem; }
     </style>
 </head>
 <body>
 
     <div class="header">
         <span class="blessing">"SHREE"</span>
-        <h1 id="viewTitle">Cost Sheet</h1>
+        <h1 id="title">Simona Costing</h1>
     </div>
 
     <div class="container">
         <div id="costPage" class="page active">
-            <button class="top-btn" style="background:var(--dark)" onclick="openM('costM')">+ Design Calculator</button>
-            <input type="text" id="searchC" class="search-box" placeholder="Search Design No..." onkeyup="filter('cost')">
-            <div id="cList">Loading...</div>
+            <button class="main-btn" style="background:var(--dark)" onclick="openM('costM')">+ DESIGN CALCULATOR</button>
+            <input type="text" class="search-bar" id="searchC" placeholder="Search Design No..." onkeyup="doSearch('cost')">
+            <div id="cList">Loading Cost Sheets...</div>
         </div>
 
         <div id="orderPage" class="page">
-            <button class="top-btn" style="background:var(--green)" onclick="openM('orderM')">+ Create New Order</button>
-            <select id="statusFilter" class="search-box" onchange="filter('order')">
-                <option value="">All Status</option>
-                <option value="Pending">Pending</option>
-                <option value="Dyeing">Dyeing</option>
-                <option value="Handwork">Handwork</option>
-                <option value="Stitching">Stitching</option>
-                <option value="Ready">Ready</option>
-                <option value="Delivered">Delivered</option>
-            </select>
-            <input type="text" id="searchO" class="search-box" placeholder="Search Party or Design..." onkeyup="filter('order')">
-            <div id="oList">Loading...</div>
+            <button class="main-btn" style="background:var(--green)" onclick="openM('orderM')">+ CREATE NEW ORDER</button>
+            <input type="text" class="search-bar" id="searchO" placeholder="Search Party or Design..." onkeyup="doSearch('order')">
+            <div id="oList">Loading Orders...</div>
         </div>
     </div>
 
     <div class="navbar">
-        <div id="navCost" class="nav-item active" onclick="go('cost')">Costing</div>
-        <div id="navOrder" class="nav-item" onclick="go('order')">Orders</div>
+        <div id="navCost" class="nav-item active" onclick="nav('cost')">Costing</div>
+        <div id="navOrder" class="nav-item" onclick="nav('order')">Orders</div>
     </div>
 
-    <div id="costM" class="modal"><div class="modal-body">
-        <h2 style="color:var(--gold); margin-top:0">Design Calculator</h2>
-        <input id="c_id" class="search-box" placeholder="Design No (e.g. 199)">
-        <div class="calc-row"><b>Fabric</b><b>Qty</b><b>Rate</b></div>
-        <div id="fInputs"></div>
+    <div id="costM" class="modal"><div class="modal-content">
+        <h2 style="margin-top:0; color:var(--gold)">Design Calculator</h2>
+        <input id="c_id" class="search-bar" placeholder="Design No.">
+        <div class="calc-grid"><b>Fabric</b><b>Qty</b><b>Rate</b></div>
+        <div id="fRows"></div>
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:10px">
-            Dyeing: <input type="number" id="m_dye" class="search-box" oninput="recalc()">
-            Stitch: <input type="number" id="m_st" class="search-box" oninput="recalc()">
-            Hand: <input type="number" id="m_hd" class="search-box" oninput="recalc()">
-            Pack: <input type="number" id="m_pk" class="search-box" oninput="recalc()">
+            Dye: <input type="number" id="m_dye" class="search-bar" oninput="calc()">
+            Stitch: <input type="number" id="m_st" class="search-bar" oninput="calc()">
+            Hand: <input type="number" id="m_hd" class="search-bar" oninput="calc()">
+            Pack: <input type="number" id="m_pk" class="search-bar" oninput="calc()">
         </div>
         <div class="sum-box">
             <div class="sum-line">Total Fabric: <span id="r_fab">0</span></div>
             <div class="sum-line" style="color:var(--red)">Total Cost: <span id="r_cost">0</span></div>
-            <div class="sum-line">Wholesale: <input type="number" id="m_ws" style="width:70px" oninput="recalc()"></div>
-            <div class="sum-line" style="color:var(--green); border-top:1px solid #ddd; padding-top:8px; margin-top:8px">Profit: <span id="r_prof">0</span></div>
+            <div class="sum-line">Wholesale: <input type="number" id="m_ws" style="width:70px" oninput="calc()"></div>
+            <div class="sum-line" style="color:var(--green); border-top:1px solid #ddd; padding-top:10px; margin-top:10px">Profit: <span id="r_prof">0</span></div>
         </div>
-        <button class="top-btn" style="background:var(--green); margin-top:15px" onclick="saveC()">Save to Sheet</button>
+        <button class="main-btn" style="background:var(--green); margin-top:15px" onclick="saveC()">Save to Google Sheet</button>
         <button onclick="closeM('costM')" style="width:100%; border:none; background:none; color:red; font-weight:bold; cursor:pointer">CANCEL</button>
     </div></div>
 
-    <div id="orderM" class="modal"><div class="modal-body">
-        <h2 style="color:var(--green)">New Order</h2>
-        <input id="o_id" class="search-box" placeholder="Design No.">
-        <input id="o_p" class="search-box" placeholder="Party Name">
-        <input id="o_s" class="search-box" placeholder="Sizes (e.g. 2-L, 4-XL)">
-        <input id="o_q" type="number" class="search-box" placeholder="Quantity">
-        <input id="o_r" type="number" class="search-box" placeholder="Party Rate">
-        <input id="o_d" type="date" class="search-box">
-        <button class="top-btn" style="background:var(--green)" onclick="saveO()">Save Order</button>
+    <div id="orderM" class="modal"><div class="modal-content">
+        <h2>New Order</h2>
+        <input id="o_id" class="search-bar" placeholder="Design No.">
+        <input id="o_p" class="search-bar" placeholder="Party Name">
+        <input id="o_q" type="number" class="search-bar" placeholder="Qty">
+        <input id="o_r" type="number" class="search-box" placeholder="Rate" style="width:100%; padding:12px; margin-bottom:10px; border-radius:8px; border:1px solid #ccc;">
+        <input id="o_d" type="date" class="search-bar">
+        <button class="main-btn" style="background:var(--green)" onclick="saveO()">Save Order</button>
         <button onclick="closeM('orderM')" style="width:100%; border:none; background:none; color:red">CANCEL</button>
     </div></div>
 
-    <div id="detM" class="modal"><div class="modal-body">
-        <h2 id="detTitle" style="color:var(--gold); margin-top:0">Details</h2>
-        <div id="detBody"></div>
-        <button class="top-btn" style="background:var(--dark); margin-top:15px" onclick="closeM('detM')">Close</button>
-    </div></div>
-
     <script>
-        const scriptUrl = "https://script.google.com/macros/s/AKfycbxZTdEaDI9NpMcZSpmvyaQfZxee21E75AprmnfCAwwYM7thkar6u1Hj0KeaRoxoYk1_3A/exec";
-        let costData = [], orderData = [];
-        const cLabels = ["Design", "F1", "F1 Qty", "F1 Rate", "F2", "F2 Qty", "F2 Rate", "F3", "F3 Qty", "F3 Rate", "F4", "F4 Qty", "F4 Rate", "F5", "F5 Qty", "F5 Rate", "F6", "F6 Qty", "F6 Rate", "Tot Fab Qty", "Dye", "Hand", "Stitch", "Pack", "Tot Cost", "Wholesale", "Profit"];
-        const oLabels = ["ID", "Party", "Date", "Deadline", "Design", "Qty", "Sizes", "Rate", "Total", "Del Date", "Del Qty", "Inv", "Pend", "Status"];
+        const scriptUrl = "https://script.google.com/macros/s/AKfycbw62m4LPJf9VY4HAr7mwB3HhnyVVigfuaSlisIXQTmGl8BqLa16JzfGG6AlqIw3b8bvag/exec";
+        let cData = [], oData = [];
 
-        function go(p) {
+        function nav(p) {
             document.querySelectorAll('.page, .nav-item').forEach(e => e.classList.remove('active'));
             document.getElementById(p+'Page').classList.add('active');
             document.getElementById('nav'+p.charAt(0).toUpperCase()+p.slice(1)).classList.add('active');
-            document.getElementById('viewTitle').innerText = p==='cost'?'Cost Sheet':'Order Sheet';
-            load(p==='cost'?'Cost Sheet':'OrderSheet');
+            document.getElementById('title').innerText = p==='cost'?'Simona Costing':'Simona Orders';
+            fetchData(p==='cost'?'Cost Sheet':'OrderSheet');
         }
 
-        async function load(s) {
+        async function fetchData(s) {
             const res = await fetch(`${scriptUrl}?sheet=${encodeURIComponent(s)}`);
             const json = await res.json();
-            if(s==='Cost Sheet') { costData = json; renderC(json); }
-            else { orderData = json; renderO(json); }
+            if(s==='Cost Sheet') { cData = json; renderC(json); }
+            else { oData = json; renderO(json); }
         }
 
         function renderC(data) {
-            document.getElementById('cList').innerHTML = data.map((r, i) => r[0] ? `<div class="card" onclick="viewDet(${i}, 'cost')"><button class="btn-del" onclick="event.stopPropagation(); del('${r[0]}','Cost Sheet')">Delete</button><h3>${r[0]}</h3><div style="color:var(--green); font-weight:bold">Wholesale: ₹${r[25]||0}</div></div>` : '').join('');
+            document.getElementById('cList').innerHTML = data.map(r => r[0] ? `<div class="card">
+                <button class="del-btn" onclick="del('${r[0]}','Cost Sheet')">Delete</button>
+                <h3>Design No: ${r[0]}</h3>
+                <p>Total Fabric: ${r[19]}m</p>
+                <p style="color:var(--green); font-weight:bold">Wholesale Price: ₹${r[25]}</p>
+            </div>` : '').join('');
         }
 
         function renderO(data) {
-            document.getElementById('oList').innerHTML = data.map((r, i) => {
-                const s = (r[13]||'Pending').toLowerCase();
-                return r[1] ? `<div class="card status-${s}" onclick="viewDet(${i}, 'order')">
-                    <button class="btn-del" onclick="event.stopPropagation(); del('${r[1]}','OrderSheet')">Delete</button>
-                    <h3>${r[1]}</h3><p>Design: ${r[4]} | Qty: ${r[5]} | <b>${r[13]||'Pending'}</b></p>
-                    <div class="status-group">
-                        <button class="s-btn" style="background:var(--blue)" onclick="event.stopPropagation(); upS('${r[1]}','${r[4]}','Dyeing')">Dye</button>
-                        <button class="s-btn" style="background:var(--purple)" onclick="event.stopPropagation(); upS('${r[1]}','${r[4]}','Handwork')">Hand</button>
-                        <button class="s-btn" style="background:var(--orange)" onclick="event.stopPropagation(); upS('${r[1]}','${r[4]}','Stitching')">Stitch</button>
-                        <button class="s-btn" style="background:#f1c40f" onclick="event.stopPropagation(); upS('${r[1]}','${r[4]}','Ready')">Ready</button>
-                        <button class="s-btn" style="background:var(--green)" onclick="event.stopPropagation(); upS('${r[1]}','${r[4]}','Delivered')">Done</button>
+            document.getElementById('oList').innerHTML = data.map(r => {
+                const s = (r[13]||'Pending').toLowerCase().replace(' ', '');
+                return r[1] ? `<div class="card status-${s}">
+                    <button class="del-btn" onclick="del('${r[1]}','OrderSheet')">Delete</button>
+                    <h3>${r[1]}</h3>
+                    <p>Design: ${r[4]} | Qty: ${r[5]} | Total: ₹${r[8]}</p>
+                    <p><b>Status: ${r[13]||'Pending'}</b></p>
+                    <div class="status-tray">
+                        <button class="tray-btn" style="background:var(--blue)" onclick="upS('${r[1]}','${r[4]}','Dyeing')">Dyeing</button>
+                        <button class="tray-btn" style="background:var(--purple)" onclick="upS('${r[1]}','${r[4]}','Handwork')">Hand</button>
+                        <button class="tray-btn" style="background:var(--orange)" onclick="upS('${r[1]}','${r[4]}','Stitching')">Stitch</button>
+                        <button class="tray-btn" style="background:#f1c40f" onclick="upS('${r[1]}','${r[4]}','Ready')">Ready</button>
+                        <button class="tray-btn" style="background:var(--green)" onclick="upS('${r[1]}','${r[4]}','Delivered')">Done</button>
                     </div>
                 </div>` : '';
             }).join('');
         }
 
-        async function upS(party, design, status) {
-            await fetch(scriptUrl, {method:'POST', body: JSON.stringify({action:'updateStatus', party:party, design:design, newStatus:status})});
-            load('OrderSheet');
+        async function upS(p, d, s) {
+            await fetch(scriptUrl, {method:'POST', body: JSON.stringify({action:'updateStatus', party:p, design:d, newStatus:s})});
+            fetchData('OrderSheet');
         }
 
         async function del(id, s) {
-            if(confirm(`Delete ${id}?`)) {
-                await fetch(scriptUrl, {method:'POST', body: JSON.stringify({action:'delete', designNo:id, sheet:s})});
-                load(s);
+            if(confirm('Delete this entry?')) {
+                await fetch(scriptUrl, {method:'POST', body: JSON.stringify({action:'delete', id:id, sheet:s})});
+                fetchData(s);
             }
         }
 
-        function viewDet(idx, type) {
-            const row = (type==='cost'?costData:orderData)[idx];
-            const labs = (type==='cost'?cLabels:oLabels);
-            let h = "";
-            row.forEach((v, i) => { if(labs[i]) h += `<div class="detail-row"><span>${labs[i]}</span><b>${v || '-'}</b></div>`; });
-            document.getElementById('detBody').innerHTML = h;
-            document.getElementById('detTitle').innerText = type==='cost'?'Design Details':'Order Details';
-            openM('detM');
-        }
-
-        function recalc() {
-            let fT = 0; for(let i=1;i<=6;i++) fT += (Number(document.getElementById('f'+i+'q').value)||0)*(Number(document.getElementById('f'+i+'r').value)||0);
-            const tc = fT + (Number(document.getElementById('m_dye').value)||0) + (Number(document.getElementById('m_st').value)||0) + (Number(document.getElementById('m_hd').value)||0) + (Number(document.getElementById('m_pk').value)||0);
-            document.getElementById('r_fab').innerText = fT.toFixed(0);
-            document.getElementById('r_cost').innerText = tc.toFixed(0);
-            document.getElementById('r_prof').innerText = ((Number(document.getElementById('m_ws').value)||0) - tc).toFixed(0);
+        function calc() {
+            let fT = 0, fQ = 0;
+            for(let i=1; i<=6; i++) {
+                let q = Number(document.getElementById('f'+i+'q').value)||0;
+                let r = Number(document.getElementById('f'+i+'r').value)||0;
+                fT += q * r; fQ += q;
+            }
+            // AUTO DYE CALCULATION: Total Fabric * 13
+            let dye = fQ * 13;
+            if(!document.getElementById('m_dye').value) document.getElementById('m_dye').placeholder = dye;
+            
+            const curDye = Number(document.getElementById('m_dye').value) || dye;
+            const tc = fT + curDye + (Number(document.getElementById('m_st').value)||0) + (Number(document.getElementById('m_hd').value)||0) + (Number(document.getElementById('m_pk').value)||0);
+            
+            document.getElementById('r_fab').innerText = fQ.toFixed(2) + "m";
+            document.getElementById('r_cost').innerText = "₹" + tc.toFixed(0);
+            document.getElementById('r_prof').innerText = "₹" + ((Number(document.getElementById('m_ws').value)||0) - tc).toFixed(0);
         }
 
         async function saveC() {
-            let d = {action:'addCost', designNo:document.getElementById('c_id').value, dyeing:document.getElementById('m_dye').value, stitch:document.getElementById('m_st').value, hand:document.getElementById('m_hd').value, pack:document.getElementById('m_pk').value, wholesale:document.getElementById('m_ws').value};
-            for(let i=1;i<=6;i++){ d['f'+i+'n']=document.getElementById('f'+i+'n').value; d['f'+i+'q']=document.getElementById('f'+i+'q').value; d['f'+i+'r']=document.getElementById('f'+i+'r').value; }
+            let fQ = 0; for(let i=1;i<=6;i++) fQ += Number(document.getElementById('f'+i+'q').value)||0;
+            let d = {action:'addCost', designNo:document.getElementById('c_id').value, dyeing:document.getElementById('m_dye').value || (fQ*13), stitch:document.getElementById('m_st').value, hand:document.getElementById('m_hd').value, pack:document.getElementById('m_pk').value, wholesale:document.getElementById('m_ws').value};
+            for(let i=1;i<=6;i++) { d['f'+i+'n']=document.getElementById('f'+i+'n').value; d['f'+i+'q']=document.getElementById('f'+i+'q').value; d['f'+i+'r']=document.getElementById('f'+i+'r').value; }
             await fetch(scriptUrl, {method:'POST', body: JSON.stringify(d)});
-            closeM('costM'); go('cost');
+            closeM('costM'); nav('cost');
         }
 
         async function saveO() {
-            const d = {targetSheet:'OrderSheet', designNo:document.getElementById('o_id').value, partyName:document.getElementById('o_p').value, sizeBreakdown:document.getElementById('o_s').value, qty:document.getElementById('o_q').value, rate:document.getElementById('o_r').value, targetDate:document.getElementById('o_d').value};
+            const d = {targetSheet:'OrderSheet', designNo:document.getElementById('o_id').value, partyName:document.getElementById('o_p').value, qty:document.getElementById('o_q').value, rate:document.getElementById('o_r').value, targetDate:document.getElementById('o_d').value};
             await fetch(scriptUrl, {method:'POST', body: JSON.stringify(d)});
-            closeM('orderM'); go('order');
+            closeM('orderM'); nav('order');
         }
 
-        function filter(t) {
+        function doSearch(t) {
             const q = document.getElementById(t==='cost'?'searchC':'searchO').value.toLowerCase();
-            if(t==='cost') renderC(costData.filter(r => r[0].toString().toLowerCase().includes(q)));
-            else {
-                const sF = document.getElementById('statusFilter').value.toLowerCase();
-                renderO(orderData.filter(r => (r[1].toLowerCase().includes(q) || r[4].toString().toLowerCase().includes(q)) && (sF === "" || (r[13]||"").toLowerCase() === sF)));
-            }
+            if(t==='cost') renderC(cData.filter(r => r[0].toString().toLowerCase().includes(q)));
+            else renderO(oData.filter(r => r[1].toLowerCase().includes(q) || r[4].toString().toLowerCase().includes(q)));
         }
 
         function openM(id) { document.getElementById(id).style.display='block'; }
         function closeM(id) { document.getElementById(id).style.display='none'; }
         
-        let fr = ""; for(let i=1;i<=6;i++) fr += `<div class="calc-row"><input id="f${i}n" class="search-box" placeholder="F${i}"><input id="f${i}q" type="number" class="search-box" oninput="recalc()"><input id="f${i}r" type="number" class="search-box" oninput="recalc()"></div>`;
-        document.getElementById('fInputs').innerHTML = fr;
-        go('cost');
+        let fr = ""; for(let i=1;i<=6;i++) fr += `<div class="calc-grid"><input id="f${i}n" class="search-bar" style="margin-bottom:0" placeholder="Fabric ${i}"><input id="f${i}q" type="number" class="search-bar" style="margin-bottom:0" oninput="calc()"><input id="f${i}r" type="number" class="search-bar" style="margin-bottom:0" oninput="calc()"></div>`;
+        document.getElementById('fRows').innerHTML = fr;
+        nav('cost');
     </script>
 </body>
 </html>
