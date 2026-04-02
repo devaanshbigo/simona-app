@@ -16,8 +16,8 @@
         .page { display: none; }
         .page.active { display: block; }
         .search-box { width: 100%; padding: 15px; margin-bottom: 20px; border-radius: 25px; border: 1px solid #ddd; outline: none; box-sizing: border-box; font-size: 1rem; }
-        .card { background: white; border-radius: 15px; padding: 20px; margin-bottom: 15px; position: relative; border-left: 6px solid var(--gold); box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-        .btn-delete { position: absolute; top: 15px; right: 15px; background: var(--red); color: white; border: none; border-radius: 6px; padding: 6px 12px; cursor: pointer; font-size: 0.7em; }
+        .card { background: white; border-radius: 15px; padding: 20px; margin-bottom: 15px; position: relative; border-left: 6px solid var(--gold); box-shadow: 0 4px 6px rgba(0,0,0,0.05); cursor: pointer; }
+        .btn-delete { position: absolute; top: 15px; right: 15px; background: var(--red); color: white; border: none; border-radius: 6px; padding: 6px 12px; cursor: pointer; font-size: 0.7em; z-index: 10; }
         .top-btn { width: 100%; padding: 15px; color: white; border: none; border-radius: 12px; font-weight: bold; margin-bottom: 20px; cursor: pointer; font-size: 1rem; }
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 2000; overflow-y: auto; }
         .modal-content { background: white; width: 95%; max-width: 550px; margin: 20px auto; padding: 20px; border-radius: 20px; box-sizing: border-box; }
@@ -26,7 +26,7 @@
         input { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; }
         .calc-summary { background: #f0f4f7; padding: 15px; border-radius: 10px; margin: 15px 0; }
         .summary-line { display: flex; justify-content: space-between; font-weight: bold; margin-bottom: 5px; }
-        .profit-table tr td { padding: 5px; border-bottom: 1px solid #eee; }
+        .detail-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #eee; font-size: 0.9rem; }
     </style>
 </head>
 <body>
@@ -39,13 +39,13 @@
     <div class="container">
         <div id="costPage" class="page active">
             <button class="top-btn" style="background:var(--dark)" onclick="openM('costModal')">+ Design Calculator</button>
-            <input type="text" class="search-box" id="searchCost" placeholder="Search Design No..." onkeyup="filter('cost')">
+            <input type="text" class="search-box" id="searchCost" placeholder="Search Design No..." onkeyup="filterData('cost')">
             <div id="costList">Loading Designs...</div>
         </div>
 
         <div id="orderPage" class="page">
             <button class="top-btn" style="background:var(--green)" onclick="openM('orderModal')">+ Create New Order</button>
-            <input type="text" class="search-box" id="searchOrder" placeholder="Search Party/Design..." onkeyup="filter('order')">
+            <input type="text" class="search-box" id="searchOrder" placeholder="Search Party/Design..." onkeyup="filterData('order')">
             <div id="orderList">Loading Orders...</div>
         </div>
     </div>
@@ -61,8 +61,7 @@
             <input type="text" id="c_design" placeholder="Design No." style="margin-bottom:10px; font-weight:bold; border:2px solid var(--gold)">
             <table>
                 <tr><th>Fabric</th><th>Qty</th><th>Rate</th></tr>
-                <tbody id="fabRows">
-                    </tbody>
+                <tbody id="fabRows"></tbody>
             </table>
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
                 <div>Stitch: <input type="number" id="stitch" oninput="runCalc()"></div>
@@ -73,17 +72,10 @@
             <div class="calc-summary">
                 <div class="summary-line">Total Fabric Cost: <span id="res_f_cost">0</span></div>
                 <div class="summary-line" style="color:var(--red)">OVERALL COST: <span id="res_total">0</span></div>
+                <div class="summary-line">Wholesale: <input type="number" id="wholesale" style="width:70px" oninput="runCalc()"></div>
+                <div class="summary-line" style="color:var(--green)">Profit: <span id="res_profit">0</span> (<span id="res_per">0%</span>)</div>
             </div>
-            <h3>Profit Check</h3>
-            <table class="profit-table">
-                <tr style="background:#f9f9f9"><td>Wholesale Rate</td><td>Profit</td><td>%</td></tr>
-                <tr>
-                    <td><input type="number" id="wholesale" placeholder="₹" oninput="runCalc()"></td>
-                    <td id="res_profit">0</td>
-                    <td id="res_per">0%</td>
-                </tr>
-            </table>
-            <button class="top-btn" style="background:var(--green); margin-top:10px;" onclick="saveCost()">Save Design</button>
+            <button class="top-btn" style="background:var(--green)" onclick="saveCost()">Save Design</button>
             <button onclick="closeM('costModal')" style="width:100%; background:none; border:none; color:red; cursor:pointer">Cancel</button>
         </div>
     </div>
@@ -97,14 +89,24 @@
             <input type="number" id="qty" placeholder="Quantity">
             <input type="number" id="rate" placeholder="Rate">
             <input type="date" id="deadline">
-            <button class="top-btn" style="background:var(--green); margin-top:10px" onclick="saveOrder()">Save Order</button>
+            <button class="top-btn" style="background:var(--green)" onclick="saveOrder()">Save Order</button>
             <button onclick="closeM('orderModal')" style="width:100%; background:none; border:none; color:red; cursor:pointer">Cancel</button>
         </div>
     </div>
 
+    <div id="detailsModal" class="modal">
+        <div class="modal-content">
+            <h2 id="detTitle" style="margin-top:0; color:var(--gold)">Details</h2>
+            <div id="detBody"></div>
+            <button class="top-btn" style="background:var(--dark); margin-top:15px;" onclick="closeM('detailsModal')">Close</button>
+        </div>
+    </div>
+
     <script>
-        const scriptUrl = "https://script.google.com/macros/s/AKfycbz7ceBp9mI-QzizG4rxtHGcXCd0n_zhdqfovhQ7h3DEei_QqWx41RXN13XlmlJ499wMDQ/exec";
+        const scriptUrl = "https://script.google.com/macros/s/AKfycbz4DCwxdSOxx6Z9v-r7gwOr_z8VF4OsQdrRHtxZNd_M0ul6UKXURKGJ8Lf60iCHCoJoCg/exec";
         let cData = [], oData = [];
+        const cLabels = ["Design No", "F1", "F1 Qty", "F1 Rate", "F2", "F2 Qty", "F2 Rate", "F3", "F3 Qty", "F3 Rate", "F4", "F4 Qty", "F4 Rate", "F5", "F5 Qty", "F5 Rate", "F6", "F6 Qty", "F6 Rate", "Total Fabric Qty", "Dyeing", "Handwork", "Stitching", "Packing", "Total Cost", "Wholesale", "Profit"];
+        const oLabels = ["ID", "Party", "Date", "Deadline", "Design", "Qty", "Sizes", "Rate", "Total", "Del Date", "Del Qty", "Invoice", "Pending", "Status"];
 
         function switchP(p) {
             document.getElementById('costPage').classList.toggle('active', p==='cost');
@@ -118,22 +120,22 @@
         async function load(s) {
             const res = await fetch(`${scriptUrl}?sheet=${encodeURIComponent(s)}`);
             const json = await res.json();
-            s === 'Cost Sheet' ? (cData = json, renderC()) : (oData = json, renderO());
+            s === 'Cost Sheet' ? (cData = json, renderC(json)) : (oData = json, renderO(json));
         }
 
-        function renderC() {
+        function renderC(data) {
             let h = "";
-            cData.forEach(r => { if(r[0]) h += `<div class="card">
-                <button class="btn-delete" onclick="del('${r[0]}','Cost Sheet')">Delete</button>
-                <h3>${r[0]}</h3><div style="color:var(--green); font-weight:bold">Wholesale: ₹${r[25]}</div></div>`; });
+            data.forEach((r, i) => { if(r[0]) h += `<div class="card" onclick="viewDetails(${i}, 'cost')">
+                <button class="btn-delete" onclick="event.stopPropagation(); del('${r[0]}','Cost Sheet')">Delete</button>
+                <h3>${r[0]}</h3><div style="color:var(--green); font-weight:bold">Wholesale: ₹${r[25] || 0}</div></div>`; });
             document.getElementById('costList').innerHTML = h;
         }
 
-        function renderO() {
+        function renderO(data) {
             let h = "";
-            oData.forEach(r => { if(r[1]) h += `<div class="card">
-                <button class="btn-delete" onclick="del('${r[1]}','OrderSheet')">Delete</button>
-                <h3>${r[1]}</h3><p>Design: ${r[4]} | Qty: ${r[5]}</p></div>`; });
+            data.forEach((r, i) => { if(r[1]) h += `<div class="card" onclick="viewDetails(${i}, 'order')">
+                <button class="btn-delete" onclick="event.stopPropagation(); del('${r[1]}','OrderSheet')">Delete</button>
+                <h3>${r[1]}</h3><p>Design: ${r[4]} | Party: ${r[1]}</p></div>`; });
             document.getElementById('orderList').innerHTML = h;
         }
 
@@ -148,7 +150,6 @@
             const total = fCost + dye + (Number(document.getElementById('stitch').value)||0) + (Number(document.getElementById('hand').value)||0) + (Number(document.getElementById('pack').value)||0);
             const wholesale = Number(document.getElementById('wholesale').value)||0;
             const profit = wholesale - total;
-
             document.getElementById('res_dye').innerText = "₹"+dye.toFixed(0);
             document.getElementById('res_f_cost').innerText = "₹"+fCost.toFixed(0);
             document.getElementById('res_total').innerText = "₹"+total.toFixed(0);
@@ -176,10 +177,26 @@
             }
         }
 
+        function viewDetails(idx, type) {
+            const labels = type === 'cost' ? cLabels : oLabels;
+            const row = type === 'cost' ? cData[idx] : oData[idx];
+            let h = "";
+            row.forEach((v, i) => { if(labels[i]) h += `<div class="detail-row"><span>${labels[i]}</span><b>${v || '-'}</b></div>`; });
+            document.getElementById('detBody').innerHTML = h;
+            document.getElementById('detTitle').innerText = type === 'cost' ? 'Design Details' : 'Order Details';
+            openM('detailsModal');
+        }
+
+        function filterData(type) {
+            const q = document.getElementById(type === 'cost' ? 'searchCost' : 'searchOrder').value.toLowerCase();
+            const source = type === 'cost' ? cData : oData;
+            const filtered = source.filter(r => r.some(cell => cell.toString().toLowerCase().includes(q)));
+            type === 'cost' ? renderC(filtered) : renderO(filtered);
+        }
+
         function openM(id) { document.getElementById(id).style.display='block'; }
         function closeM(id) { document.getElementById(id).style.display='none'; }
         
-        // Initializing rows
         let fH = "";
         for(let i=1; i<=6; i++) fH += `<tr><td><input id="f${i}n" placeholder="F${i}"></td><td><input type="number" id="f${i}q" oninput="runCalc()"></td><td><input type="number" id="f${i}r" oninput="runCalc()"></td></tr>`;
         document.getElementById('fabRows').innerHTML = fH;
