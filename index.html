@@ -1,57 +1,62 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Simona Management</title>
+    <title>Simona Management Pro</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-        :root { --gold: #c5a059; --dark: #1a1a1a; --border: #e1e1e1; --bg: #fdfdfd; }
-        body { font-family: 'Helvetica Neue', Arial, sans-serif; margin: 0; background: var(--bg); color: #333; padding-bottom: 80px; }
+        :root { --gold: #c5a059; --dark: #1a1a1a; --border: #e8e8e8; --bg: #f9f9f9; --green: #27ae60; --red: #e74c3c; }
+        body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; margin: 0; background: var(--bg); color: #333; padding-bottom: 80px; }
         
+        /* HEADER */
         .header { text-align: center; padding: 25px 10px; background: white; border-bottom: 1px solid var(--border); }
-        .blessing { font-size: 0.7rem; letter-spacing: 3px; color: #999; display: block; margin-bottom: 5px; }
-        h1 { margin: 0; font-size: 1.2rem; font-weight: 400; text-transform: uppercase; letter-spacing: 1px; }
+        .blessing { font-size: 0.65rem; letter-spacing: 4px; color: #aaa; text-transform: uppercase; display: block; margin-bottom: 4px; }
+        h1 { margin: 0; font-size: 1.1rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--dark); }
 
-        .container { padding: 20px; max-width: 1000px; margin: auto; }
+        /* NAVIGATION - NO EMOJIS */
+        .navbar { position: fixed; bottom: 0; width: 100%; height: 65px; background: white; display: flex; border-top: 1px solid var(--border); z-index: 1000; box-shadow: 0 -2px 10px rgba(0,0,0,0.03); }
+        .nav-item { flex: 1; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #999; cursor: pointer; transition: 0.2s; }
+        .nav-item.active { color: var(--gold); border-top: 3px solid var(--gold); background: #fdfaf4; }
+
+        .container { padding: 15px; max-width: 1100px; margin: auto; }
         .page { display: none; }
         .page.active { display: block; }
 
-        /* NAVBAR - CLEAN TEXT ONLY */
-        .navbar { position: fixed; bottom: 0; width: 100%; height: 60px; background: white; display: flex; border-top: 1px solid var(--border); z-index: 1000; }
-        .nav-item { flex: 1; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; color: #888; font-weight: 600; cursor: pointer; }
-        .nav-item.active { color: var(--gold); border-top: 2px solid var(--gold); }
+        /* CLASSY TABLES */
+        .table-card { background: white; border-radius: 8px; border: 1px solid var(--border); overflow-x: auto; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+        table { width: 100%; border-collapse: collapse; min-width: 950px; }
+        th { background: #fcfcfc; padding: 15px 12px; text-align: left; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; color: #888; border-bottom: 2px solid #f0f0f0; }
+        td { padding: 14px 12px; border-bottom: 1px solid #f4f4f4; font-size: 0.85rem; color: #444; }
+        .price-input { width: 75px; padding: 5px; border: none; border-bottom: 1.5px solid #eee; text-align: center; color: var(--green); font-weight: 700; outline: none; transition: 0.2s; }
+        .price-input:focus { border-bottom-color: var(--gold); }
 
-        /* TABLES & CARDS */
-        .search-area { display: flex; gap: 10px; margin-bottom: 20px; }
-        .input-field { flex: 1; padding: 12px; border: 1px solid var(--border); border-radius: 4px; outline: none; }
-        
-        .table-wrap { background: white; border: 1px solid var(--border); overflow-x: auto; border-radius: 4px; }
-        table { width: 100%; border-collapse: collapse; min-width: 900px; }
-        th { background: #f9f9f9; padding: 15px 10px; text-align: left; font-size: 0.7rem; text-transform: uppercase; border-bottom: 2px solid #eee; }
-        td { padding: 15px 10px; border-bottom: 1px solid #eee; font-size: 0.85rem; }
-        
-        .price-in { width: 70px; border: none; border-bottom: 1px solid #ccc; text-align: center; background: transparent; font-weight: bold; color: #27ae60; }
-        .card { background: white; padding: 20px; border: 1px solid var(--border); border-radius: 4px; margin-bottom: 15px; position: relative; }
-        .action-btn { background: var(--dark); color: white; padding: 12px 20px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; width: 100%; margin-bottom: 20px; }
+        /* CARDS & BUTTONS */
+        .search-row { display: flex; gap: 10px; margin-bottom: 20px; }
+        .search-bar { flex: 1; padding: 12px 15px; border: 1px solid var(--border); border-radius: 6px; font-size: 0.9rem; outline: none; }
+        .action-btn { background: var(--dark); color: white; padding: 16px; border: none; border-radius: 8px; font-weight: 700; letter-spacing: 1px; width: 100%; margin-bottom: 20px; cursor: pointer; text-transform: uppercase; }
+        .item-card { background: white; padding: 20px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
 
-        /* REVERTED CALCULATOR UI */
+        /* CALCULATOR UI (RESTORED FROM IMAGE_298921.PNG) */
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 2000; overflow-y: auto; }
-        .modal-box { background: white; width: 95%; max-width: 500px; margin: 30px auto; padding: 25px; border-radius: 8px; }
-        .calc-row { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 10px; margin-bottom: 8px; }
+        .modal-body { background: white; width: 92%; max-width: 500px; margin: 25px auto; padding: 25px; border-radius: 12px; box-sizing: border-box; }
+        .calc-row { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+        .calc-label { font-size: 0.75rem; font-weight: 700; color: #777; margin-bottom: 4px; }
+        .summary-box { background: #f8fafb; border-radius: 10px; padding: 20px; margin-top: 20px; }
+        .sum-line { display: flex; justify-content: space-between; margin-bottom: 8px; font-weight: 600; font-size: 0.95rem; }
     </style>
 </head>
 <body>
 
     <div class="header">
         <span class="blessing">"SHREE"</span>
-        <h1 id="viewTitle">Price List</h1>
+        <h1 id="pageTitle">Price List</h1>
     </div>
 
     <div class="container">
         <div id="pricePage" class="page active">
-            <div class="table-wrap">
+            <div class="table-card">
                 <table>
                     <thead>
-                        <tr><th>Design</th><th>Costing</th><th>Durgeshwari</th><th>Nav Durga</th><th>Prabha</th><th>Rangana</th><th>SarwaMangla</th><th>Sammanita</th><th>Jhankar</th></tr>
+                        <tr><th>Design No.</th><th>Costing</th><th>Durgeshwari</th><th>Nav Durga</th><th>Prabha</th><th>Rangana</th><th>SarwaMangla</th><th>Sammanita</th><th>Jhankar</th></tr>
                     </thead>
                     <tbody id="pBody"></tbody>
                 </table>
@@ -59,121 +64,125 @@
         </div>
 
         <div id="costPage" class="page">
-            <button class="action-btn" onclick="openM('costM')">+ DESIGN CALCULATOR</button>
-            <div class="search-area"><input type="text" class="input-field" id="searchC" placeholder="Search Design No..." onkeyup="filterC()"></div>
+            <button class="action-btn" onclick="openM('costM')">+ Design Calculator</button>
+            <div class="search-row"><input type="text" id="searchC" class="search-bar" placeholder="Search Design No..." onkeyup="doSearch('cost')"></div>
             <div id="cList"></div>
         </div>
 
         <div id="orderPage" class="page">
-            <button class="action-btn" style="background:#27ae60" onclick="openM('orderM')">+ CREATE ORDER</button>
-            <div class="search-area"><input type="text" class="input-field" id="searchO" placeholder="Search Orders..." onkeyup="filterO()"></div>
+            <button class="action-btn" style="background:var(--green)" onclick="openM('orderM')">+ Create New Order</button>
+            <div class="search-row"><input type="text" id="searchO" class="search-bar" placeholder="Search Party or Design..." onkeyup="doSearch('order')"></div>
             <div id="oList"></div>
         </div>
     </div>
 
     <div class="navbar">
-        <div id="navPrice" class="nav-item active" onclick="showP('price')">Price List</div>
-        <div id="navCost" class="nav-item" onclick="showP('cost')">Costing</div>
-        <div id="navOrder" class="nav-item" onclick="showP('order')">Orders</div>
+        <div id="navPrice" class="nav-item active" onclick="nav('price')">Price List</div>
+        <div id="navCost" class="nav-item" onclick="nav('cost')">Costing</div>
+        <div id="navOrder" class="nav-item" onclick="nav('order')">Orders</div>
     </div>
 
-    <div id="costM" class="modal"><div class="modal-box">
-        <h2 style="margin-top:0">Design Calculator</h2>
-        <input id="c_id" class="input-field" placeholder="Design No." style="margin-bottom:15px">
-        <div class="calc-row"><b>Fabric</b><b>Qty</b><b>Rate</b></div>
-        <div id="fRows"></div>
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:15px">
-            Dye: <input type="number" id="m_dye" class="input-field" oninput="calc()">
-            Stitch: <input type="number" id="m_st" class="input-field" oninput="calc()">
-            Hand: <input type="number" id="m_hd" class="input-field" oninput="calc()">
-            Pack: <input type="number" id="m_pk" class="input-field" oninput="calc()">
+    <div id="costM" class="modal"><div class="modal-body">
+        <h2 style="margin-top:0; color:var(--gold); font-size:1.3rem;">Design Calculator</h2>
+        <input id="c_id" class="search-bar" placeholder="Enter Design Number" style="width:100%; margin-bottom:20px; border-width:2px;">
+        <div class="calc-row"><span class="calc-label">Fabric</span><span class="calc-label">Qty</span><span class="calc-label">Rate</span></div>
+        <div id="fInputs"></div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:15px;">
+            <div><span class="calc-label">Dyeing:</span><input type="number" id="m_dye" class="search-bar" oninput="recalc()"></div>
+            <div><span class="calc-label">Stitching:</span><input type="number" id="m_st" class="search-bar" oninput="recalc()"></div>
+            <div><span class="calc-label">Handwork:</span><input type="number" id="m_hd" class="search-bar" oninput="recalc()"></div>
+            <div><span class="calc-label">Packing:</span><input type="number" id="m_pk" class="search-bar" oninput="recalc()"></div>
         </div>
-        <div style="background:#f4f4f4; padding:15px; margin:15px 0; border-radius:4px">
-            <div style="display:flex; justify-content:space-between">Total Cost: <b id="r_cost">0</b></div>
-            <div style="display:flex; justify-content:space-between; margin-top:10px">Wholesale: <input type="number" id="m_ws" style="width:80px" oninput="calc()"></div>
-            <div style="display:flex; justify-content:space-between; margin-top:10px; color:#27ae60">Profit: <b id="r_prof">0</b></div>
+        <div class="summary-box">
+            <div class="sum-line"><span>Total Fabric:</span> <span id="r_fab">0.00</span></div>
+            <div class="sum-line" style="color:var(--red)"><span>Total Cost:</span> <span id="r_cost">0.00</span></div>
+            <div class="sum-line"><span>Wholesale:</span> <input type="number" id="m_ws" style="width:80px; text-align:right;" oninput="recalc()"></div>
+            <div class="sum-line" style="color:var(--green); font-size:1.1rem; border-top:1px solid #ddd; padding-top:10px; margin-top:10px;"><span>Net Profit:</span> <span id="r_prof">0.00</span></div>
         </div>
-        <button class="action-btn" style="background:#27ae60" onclick="saveC()">SAVE TO GOOGLE SHEET</button>
-        <button onclick="closeM('costM')" style="width:100%; background:none; border:none; color:red; cursor:pointer">CANCEL</button>
+        <button class="action-btn" style="background:var(--green); margin-top:20px;" onclick="saveC()">Save to Google Sheet</button>
+        <button onclick="closeM('costM')" style="width:100%; border:none; background:none; color:red; cursor:pointer; font-weight:700;">CANCEL</button>
     </div></div>
 
-    <div id="orderM" class="modal"><div class="modal-box">
+    <div id="orderM" class="modal"><div class="modal-body">
         <h2>New Order</h2>
-        <input id="o_id" class="input-field" placeholder="Design No." style="margin-bottom:10px">
-        <input id="o_p" class="input-field" placeholder="Party Name" style="margin-bottom:10px">
-        <input id="o_q" type="number" class="input-field" placeholder="Qty" style="margin-bottom:10px">
-        <input id="o_r" type="number" class="input-field" placeholder="Rate" style="margin-bottom:10px">
-        <input id="o_d" type="date" class="input-field" style="margin-bottom:15px">
-        <button class="action-btn" style="background:#27ae60" onclick="saveO()">SAVE ORDER</button>
-        <button onclick="closeM('orderM')" style="width:100%; border:none; background:none; color:red">CANCEL</button>
+        <input id="o_id" class="search-bar" placeholder="Design No." style="width:100%; margin-bottom:10px;">
+        <input id="o_p" class="search-bar" placeholder="Party Name" style="width:100%; margin-bottom:10px;">
+        <input id="o_q" type="number" class="search-bar" placeholder="Qty" style="width:100%; margin-bottom:10px;">
+        <input id="o_r" type="number" class="search-bar" placeholder="Rate" style="width:100%; margin-bottom:10px;">
+        <input id="o_d" type="date" class="search-bar" style="width:100%; margin-bottom:20px;">
+        <button class="action-btn" style="background:var(--green)" onclick="saveO()">Save Order</button>
+        <button onclick="closeM('orderM')" style="width:100%; border:none; background:none; color:red;">CANCEL</button>
     </div></div>
 
     <script>
-        const scriptUrl = "https://script.google.com/macros/s/AKfycbycv76cbpTmVI598rc8sJzn_axC9CrKQCqWSd7IaVKLZ0OioZEig482A8eW95ORfW2L9g/exec";
-        let cData = [], oData = [];
+        const scriptUrl = "https://script.google.com/macros/s/AKfycbyFTKA54IDDot4yHNvZ_0irA44PR28waTb7SmOVDwyO_xvdCxhJCPGYRDxHwXkUFZLGdQ/exec";
+        let costData = [], orderData = [];
 
-        function showP(p) {
-            document.querySelectorAll('.page').forEach(e => e.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(e => e.classList.remove('active'));
+        async function nav(p) {
+            document.querySelectorAll('.page, .nav-item').forEach(e => e.classList.remove('active'));
             document.getElementById(p+'Page').classList.add('active');
             document.getElementById('nav'+p.charAt(0).toUpperCase()+p.slice(1)).classList.add('active');
-            document.getElementById('viewTitle').innerText = p === 'price' ? 'Price List' : (p === 'cost' ? 'Simona Design List' : 'Simona Order List');
-            load(p === 'price' ? 'Price List' : (p === 'cost' ? 'Cost Sheet' : 'OrderSheet'));
+            document.getElementById('pageTitle').innerText = p==='price'?'Price List':(p==='cost'?'Simona Design List':'Simona Order List');
+            load(p==='price'?'Price List':(p==='cost'?'Cost Sheet':'OrderSheet'));
         }
 
         async function load(s) {
             const res = await fetch(`${scriptUrl}?sheet=${encodeURIComponent(s)}`);
             const json = await res.json();
-            if(s === 'Price List') renderP(json);
-            if(s === 'Cost Sheet') { cData = json; renderC(json); }
-            if(s === 'OrderSheet') { oData = json; renderO(json); }
+            if(s==='Price List') renderP(json);
+            if(s==='Cost Sheet') { costData = json; renderC(json); }
+            if(s==='OrderSheet') { orderData = json; renderO(json); }
         }
 
         function renderP(data) {
-            document.getElementById('pBody').innerHTML = data.map(r => r[0] ? `<tr><td><b>${r[0]}</b></td><td>₹${r[1]}</td>
-                ${[2,3,4,5,6,7,8].map(col => `<td><input class="price-in" value="${r[col]||''}" onchange="upP('${r[0]}',${col},this.value)"></td>`).join('')}
+            document.getElementById('pBody').innerHTML = data.map(r => r[0] ? `<tr><td><b>${r[0]}</b></td><td>₹${Number(r[1]).toFixed(2)}</td>
+                ${[2,3,4,5,6,7,8].map(col => `<td><input class="price-input" value="${r[col]||''}" onchange="upP('${r[0]}',${col},this.value)"></td>`).join('')}
                 </tr>` : '').join('');
         }
 
         function renderC(data) {
-            document.getElementById('cList').innerHTML = data.map(r => r[0] ? `<div class="card"><h3>${r[0]}</h3><div style="color:#27ae60; font-weight:bold">Wholesale: ₹${r[25]||0}</div></div>` : '').join('');
+            document.getElementById('cList').innerHTML = data.map(r => r[0] ? `<div class="item-card"><h3>${r[0]}</h3><div style="color:var(--green); font-weight:700">Wholesale: ₹${r[25]||0}</div></div>` : '').join('');
         }
 
         function renderO(data) {
-            document.getElementById('oList').innerHTML = data.map(r => r[1] ? `<div class="card"><h3>${r[1]}</h3><p>Design: ${r[4]} | Qty: ${r[5]}</p><p><b>Status: ${r[13]||'Pending'}</b></p></div>` : '').join('');
+            document.getElementById('oList').innerHTML = data.map(r => r[1] ? `<div class="item-card"><h3>${r[1]}</h3><p>Design: ${r[4]} | Qty: ${r[5]}</p><p><b>Status: ${r[13]||'Pending'}</b></p></div>` : '').join('');
         }
 
         async function upP(id, col, val) { await fetch(scriptUrl, {method:'POST', body: JSON.stringify({action:'updatePrice', designNo:id, col:col, val:val})}); }
 
-        function calc() {
-            let ft = 0; for(let i=1;i<=6;i++) ft += (Number(document.getElementById('f'+i+'q').value)||0)*(Number(document.getElementById('f'+i+'r').value)||0);
-            const tc = ft + (Number(document.getElementById('m_dye').value)||0) + (Number(document.getElementById('m_st').value)||0) + (Number(document.getElementById('m_hd').value)||0) + (Number(document.getElementById('m_pk').value)||0);
-            document.getElementById('r_cost').innerText = tc.toFixed(0);
-            document.getElementById('r_prof').innerText = ((Number(document.getElementById('m_ws').value)||0) - tc).toFixed(0);
+        function recalc() {
+            let fTot = 0; for(let i=1; i<=6; i++) fTot += (Number(document.getElementById('f'+i+'q').value)||0) * (Number(document.getElementById('f'+i+'r').value)||0);
+            const tc = fTot + (Number(document.getElementById('m_dye').value)||0) + (Number(document.getElementById('m_st').value)||0) + (Number(document.getElementById('m_hd').value)||0) + (Number(document.getElementById('m_pk').value)||0);
+            document.getElementById('r_fab').innerText = fTot.toFixed(2);
+            document.getElementById('r_cost').innerText = tc.toFixed(2);
+            document.getElementById('r_prof').innerText = ((Number(document.getElementById('m_ws').value)||0) - tc).toFixed(2);
         }
 
         async function saveC() {
             let d = {action:'addCost', designNo:document.getElementById('c_id').value, dyeing:document.getElementById('m_dye').value, stitch:document.getElementById('m_st').value, hand:document.getElementById('m_hd').value, pack:document.getElementById('m_pk').value, wholesale:document.getElementById('m_ws').value};
-            for(let i=1;i<=6;i++){ d['f'+i+'n']=document.getElementById('f'+i+'n').value; d['f'+i+'q']=document.getElementById('f'+i+'q').value; d['f'+i+'r']=document.getElementById('f'+i+'r').value; }
+            for(let i=1; i<=6; i++){ d['f'+i+'n']=document.getElementById('f'+i+'n').value; d['f'+i+'q']=document.getElementById('f'+i+'q').value; d['f'+i+'r']=document.getElementById('f'+i+'r').value; }
             await fetch(scriptUrl, {method:'POST', body: JSON.stringify(d)});
-            closeM('costM'); showP('cost');
+            closeM('costM'); nav('cost');
         }
 
         async function saveO() {
             const d = {targetSheet:'OrderSheet', designNo:document.getElementById('o_id').value, partyName:document.getElementById('o_p').value, qty:document.getElementById('o_q').value, rate:document.getElementById('o_r').value, targetDate:document.getElementById('o_d').value};
             await fetch(scriptUrl, {method:'POST', body: JSON.stringify(d)});
-            closeM('orderM'); showP('order');
+            closeM('orderM'); nav('order');
         }
 
-        function filterC() { const q = document.getElementById('searchC').value.toLowerCase(); renderC(cData.filter(r => r[0].toString().toLowerCase().includes(q))); }
-        function filterO() { const q = document.getElementById('searchO').value.toLowerCase(); renderO(oData.filter(r => r[1].toString().toLowerCase().includes(q) || r[4].toString().toLowerCase().includes(q))); }
+        function doSearch(type) {
+            const q = document.getElementById(type==='cost'?'searchC':'searchO').value.toLowerCase();
+            if(type==='cost') renderC(costData.filter(r => r[0].toString().toLowerCase().includes(q)));
+            else renderO(orderData.filter(r => r[1].toString().toLowerCase().includes(q) || r[4].toString().toLowerCase().includes(q)));
+        }
 
         function openM(id) { document.getElementById(id).style.display='block'; }
         function closeM(id) { document.getElementById(id).style.display='none'; }
         
-        let fr = ""; for(let i=1;i<=6;i++) fr += `<div class="calc-row"><input id="f${i}n" class="input-field" placeholder="F${i}"><input id="f${i}q" type="number" class="input-field" oninput="calc()"><input id="f${i}r" type="number" class="input-field" oninput="calc()"></div>`;
-        document.getElementById('fRows').innerHTML = fr;
-        showP('price');
+        let fi = ""; for(let i=1; i<=6; i++) fi += `<div class="calc-row"><input id="f${i}n" class="search-bar" placeholder="Fabric ${i}"><input id="f${i}q" type="number" class="search-bar" oninput="recalc()"><input id="f${i}r" type="number" class="search-bar" oninput="recalc()"></div>`;
+        document.getElementById('fInputs').innerHTML = fi;
+        nav('price');
     </script>
 </body>
 </html>
