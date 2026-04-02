@@ -4,7 +4,7 @@
     <title>Simona Management Pro</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-        :root { --gold: #d4a017; --dark: #2c3e50; --green: #27ae60; --light: #f8f9fa; --red: #ff7675; }
+        :root { --gold: #d4a017; --dark: #2c3e50; --green: #27ae60; --light: #f8f9fa; --red: #ff7675; --blue: #3498db; }
         body { font-family: 'Segoe UI', sans-serif; margin: 0; background: var(--light); padding-bottom: 90px; }
         .header { text-align: center; padding: 20px; background: white; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
         .blessing { font-style: italic; color: #95a5a6; font-size: 0.8em; display: block; }
@@ -23,10 +23,14 @@
         .modal-content { background: white; width: 95%; max-width: 550px; margin: 20px auto; padding: 20px; border-radius: 20px; box-sizing: border-box; }
         table { width: 100%; border-collapse: collapse; margin-bottom: 15px; font-size: 0.8em; }
         th { background: #eee; padding: 8px; }
-        input { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; }
+        input, select { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; }
         .calc-summary { background: #f0f4f7; padding: 15px; border-radius: 10px; margin: 15px 0; }
         .summary-line { display: flex; justify-content: space-between; font-weight: bold; margin-bottom: 5px; }
         .detail-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #eee; font-size: 0.9rem; }
+        
+        /* Status Styling */
+        .status-badge { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 0.75em; margin-top: 10px; font-weight: bold; background: #eee; color: #555; }
+        .status-select { width: auto; font-size: 0.8em; margin-top: 5px; border-color: var(--blue); color: var(--blue); }
     </style>
 </head>
 <body>
@@ -103,7 +107,7 @@
     </div>
 
     <script>
-        const scriptUrl = "https://script.google.com/macros/s/AKfycbz4DCwxdSOxx6Z9v-r7gwOr_z8VF4OsQdrRHtxZNd_M0ul6UKXURKGJ8Lf60iCHCoJoCg/exec";
+        const scriptUrl = "https://script.google.com/macros/s/AKfycbweHwuwbPz0-hndvt2uASEN1sPz7LIhWxQP_V15n8Dsoq6gWSuaM9mCT0svgmU24gHbcQ/exec";
         let cData = [], oData = [];
         const cLabels = ["Design No", "F1", "F1 Qty", "F1 Rate", "F2", "F2 Qty", "F2 Rate", "F3", "F3 Qty", "F3 Rate", "F4", "F4 Qty", "F4 Rate", "F5", "F5 Qty", "F5 Rate", "F6", "F6 Qty", "F6 Rate", "Total Fabric Qty", "Dyeing", "Handwork", "Stitching", "Packing", "Total Cost", "Wholesale", "Profit"];
         const oLabels = ["ID", "Party", "Date", "Deadline", "Design", "Qty", "Sizes", "Rate", "Total", "Del Date", "Del Qty", "Invoice", "Pending", "Status"];
@@ -135,8 +139,25 @@
             let h = "";
             data.forEach((r, i) => { if(r[1]) h += `<div class="card" onclick="viewDetails(${i}, 'order')">
                 <button class="btn-delete" onclick="event.stopPropagation(); del('${r[1]}','OrderSheet')">Delete</button>
-                <h3>${r[1]}</h3><p>Design: ${r[4]} | Party: ${r[1]}</p></div>`; });
+                <h3>${r[1]}</h3>
+                <p><b>Design:</b> ${r[4]} | <b>Party:</b> ${r[1]}</p>
+                <div class="status-badge">${r[13] || 'Pending'}</div>
+                <select class="status-select" onclick="event.stopPropagation()" onchange="updateStatus('${r[1]}','${r[4]}', this.value)">
+                    <option value="">Update Stage...</option>
+                    <option value="In Dye">In Dye</option>
+                    <option value="In Handwork">In Handwork</option>
+                    <option value="In Stitching">In Stitching</option>
+                    <option value="Ready">Ready</option>
+                    <option value="Delivered">Delivered</option>
+                </select>
+            </div>`; });
             document.getElementById('orderList').innerHTML = h;
+        }
+
+        async function updateStatus(party, design, newVal) {
+            if(!newVal) return;
+            await fetch(scriptUrl, { method:'POST', body: JSON.stringify({action:'updateStatus', party:party, design:design, newStatus:newVal}) });
+            load('OrderSheet');
         }
 
         function runCalc() {
