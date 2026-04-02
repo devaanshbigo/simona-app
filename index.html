@@ -4,7 +4,7 @@
     <title>Simona Management Pro</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-        :root { --gold: #d4a017; --dark: #2c3e50; --green: #27ae60; --light: #f8f9fa; --red: #ff7675; --blue: #3498db; }
+        :root { --gold: #d4a017; --dark: #2c3e50; --green: #27ae60; --light: #f8f9fa; --red: #ff7675; --blue: #3498db; --purple: #9b59b6; --orange: #e67e22; }
         body { font-family: 'Segoe UI', sans-serif; margin: 0; background: var(--light); padding-bottom: 90px; }
         .header { text-align: center; padding: 20px; background: white; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
         .blessing { font-style: italic; color: #95a5a6; font-size: 0.8em; display: block; }
@@ -15,8 +15,20 @@
         .container { padding: 15px; }
         .page { display: none; }
         .page.active { display: block; }
-        .search-box { width: 100%; padding: 15px; margin-bottom: 20px; border-radius: 25px; border: 1px solid #ddd; outline: none; box-sizing: border-box; font-size: 1rem; }
-        .card { background: white; border-radius: 15px; padding: 20px; margin-bottom: 15px; position: relative; border-left: 6px solid var(--gold); box-shadow: 0 4px 6px rgba(0,0,0,0.05); cursor: pointer; }
+        
+        .search-box { width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 10px; border: 1px solid #ddd; outline: none; box-sizing: border-box; font-size: 0.9rem; }
+        .filter-row { display: flex; gap: 5px; margin-bottom: 20px; }
+        .filter-row select { flex: 1; padding: 8px; border-radius: 8px; border: 1px solid #ddd; font-size: 0.8rem; background: white; }
+
+        .card { background: white; border-radius: 15px; padding: 20px; margin-bottom: 15px; position: relative; border-left: 6px solid var(--gold); box-shadow: 0 4px 6px rgba(0,0,0,0.05); cursor: pointer; transition: 0.3s; }
+        
+        /* Status Colors */
+        .card.status-dye { background: #eef7ff; border-left-color: var(--blue); }
+        .card.status-handwork { background: #f9f0ff; border-left-color: var(--purple); }
+        .card.status-stitching { background: #fff5eb; border-left-color: var(--orange); }
+        .card.status-ready { background: #fffde0; border-left-color: #f1c40f; }
+        .card.status-delivered { background: #f0fff4; border-left-color: var(--green); }
+
         .btn-delete { position: absolute; top: 15px; right: 15px; background: var(--red); color: white; border: none; border-radius: 6px; padding: 6px 12px; cursor: pointer; font-size: 0.7em; z-index: 10; }
         .top-btn { width: 100%; padding: 15px; color: white; border: none; border-radius: 12px; font-weight: bold; margin-bottom: 20px; cursor: pointer; font-size: 1rem; }
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 2000; overflow-y: auto; }
@@ -24,13 +36,14 @@
         table { width: 100%; border-collapse: collapse; margin-bottom: 15px; font-size: 0.8em; }
         th { background: #eee; padding: 8px; }
         input, select { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; }
+        
         .calc-summary { background: #f0f4f7; padding: 15px; border-radius: 10px; margin: 15px 0; }
         .summary-line { display: flex; justify-content: space-between; font-weight: bold; margin-bottom: 5px; }
         .detail-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #eee; font-size: 0.9rem; }
         
-        /* Status Styling */
-        .status-badge { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 0.75em; margin-top: 10px; font-weight: bold; background: #eee; color: #555; }
-        .status-select { width: auto; font-size: 0.8em; margin-top: 5px; border-color: var(--blue); color: var(--blue); }
+        .status-container { display: flex; align-items: center; justify-content: space-between; margin-top: 15px; padding-top: 10px; border-top: 1px dashed #ccc; }
+        .status-text { font-size: 1rem; font-weight: 800; color: var(--dark); text-transform: uppercase; letter-spacing: 1px; }
+        .status-select-small { width: 130px; font-size: 0.75em; border-color: var(--blue); }
     </style>
 </head>
 <body>
@@ -49,7 +62,20 @@
 
         <div id="orderPage" class="page">
             <button class="top-btn" style="background:var(--green)" onclick="openM('orderModal')">+ Create New Order</button>
-            <input type="text" class="search-box" id="searchOrder" placeholder="Search Party/Design..." onkeyup="filterData('order')">
+            
+            <div class="filter-row">
+                <input type="text" class="search-box" style="margin-bottom:0; flex:2;" id="searchOrder" placeholder="Search Party or Design..." onkeyup="filterData('order')">
+                <select id="statusFilter" onchange="filterData('order')">
+                    <option value="">All Status</option>
+                    <option value="Pending">Pending</option>
+                    <option value="In Dye">In Dye</option>
+                    <option value="In Handwork">In Handwork</option>
+                    <option value="In Stitching">In Stitching</option>
+                    <option value="Ready">Ready</option>
+                    <option value="Delivered">Delivered</option>
+                </select>
+            </div>
+            
             <div id="orderList">Loading Orders...</div>
         </div>
     </div>
@@ -107,7 +133,7 @@
     </div>
 
     <script>
-        const scriptUrl = "https://script.google.com/macros/s/AKfycbweHwuwbPz0-hndvt2uASEN1sPz7LIhWxQP_V15n8Dsoq6gWSuaM9mCT0svgmU24gHbcQ/exec";
+        const scriptUrl = "https://script.google.com/macros/s/AKfycbxTccCqM2y54uPjfQ1xYnAf7q9TWtmdLyB44FP1sNd0Z6X_0LKvWIqscw3isycPGnEYDA/exec";
         let cData = [], oData = [];
         const cLabels = ["Design No", "F1", "F1 Qty", "F1 Rate", "F2", "F2 Qty", "F2 Rate", "F3", "F3 Qty", "F3 Rate", "F4", "F4 Qty", "F4 Rate", "F5", "F5 Qty", "F5 Rate", "F6", "F6 Qty", "F6 Rate", "Total Fabric Qty", "Dyeing", "Handwork", "Stitching", "Packing", "Total Cost", "Wholesale", "Profit"];
         const oLabels = ["ID", "Party", "Date", "Deadline", "Design", "Qty", "Sizes", "Rate", "Total", "Del Date", "Del Qty", "Invoice", "Pending", "Status"];
@@ -135,22 +161,42 @@
             document.getElementById('costList').innerHTML = h;
         }
 
+        function getStatusClass(s) {
+            if(!s) return "";
+            if(s.includes("Dye")) return "status-dye";
+            if(s.includes("Handwork")) return "status-handwork";
+            if(s.includes("Stitching")) return "status-stitching";
+            if(s.includes("Ready")) return "status-ready";
+            if(s.includes("Delivered")) return "status-delivered";
+            return "";
+        }
+
         function renderO(data) {
             let h = "";
-            data.forEach((r, i) => { if(r[1]) h += `<div class="card" onclick="viewDetails(${i}, 'order')">
-                <button class="btn-delete" onclick="event.stopPropagation(); del('${r[1]}','OrderSheet')">Delete</button>
-                <h3>${r[1]}</h3>
-                <p><b>Design:</b> ${r[4]} | <b>Party:</b> ${r[1]}</p>
-                <div class="status-badge">${r[13] || 'Pending'}</div>
-                <select class="status-select" onclick="event.stopPropagation()" onchange="updateStatus('${r[1]}','${r[4]}', this.value)">
-                    <option value="">Update Stage...</option>
-                    <option value="In Dye">In Dye</option>
-                    <option value="In Handwork">In Handwork</option>
-                    <option value="In Stitching">In Stitching</option>
-                    <option value="Ready">Ready</option>
-                    <option value="Delivered">Delivered</option>
-                </select>
-            </div>`; });
+            data.forEach((r, i) => { 
+                if(r[1]) {
+                    const status = r[13] || 'Pending';
+                    const sClass = getStatusClass(status);
+                    h += `<div class="card ${sClass}" onclick="viewDetails(${i}, 'order')">
+                        <button class="btn-delete" onclick="event.stopPropagation(); del('${r[1]}','OrderSheet')">Delete</button>
+                        <h3 style="margin-bottom:5px;">${r[1]}</h3>
+                        <p style="margin:2px 0;"><b>Design:</b> ${r[4]}</p>
+                        <p style="font-size:0.8em; color:#666;"><b>Order Date:</b> ${new Date(r[2]).toLocaleDateString()}</p>
+                        
+                        <div class="status-container">
+                            <span class="status-text">${status}</span>
+                            <select class="status-select-small" onclick="event.stopPropagation()" onchange="updateStatus('${r[1]}','${r[4]}', this.value)">
+                                <option value="">Update Stage...</option>
+                                <option value="In Dye">In Dye</option>
+                                <option value="In Handwork">In Handwork</option>
+                                <option value="In Stitching">In Stitching</option>
+                                <option value="Ready">Ready</option>
+                                <option value="Delivered">Delivered</option>
+                            </select>
+                        </div>
+                    </div>`; 
+                }
+            });
             document.getElementById('orderList').innerHTML = h;
         }
 
@@ -202,17 +248,31 @@
             const labels = type === 'cost' ? cLabels : oLabels;
             const row = type === 'cost' ? cData[idx] : oData[idx];
             let h = "";
-            row.forEach((v, i) => { if(labels[i]) h += `<div class="detail-row"><span>${labels[i]}</span><b>${v || '-'}</b></div>`; });
+            row.forEach((v, i) => { if(labels[i]) {
+                let displayVal = v;
+                if(labels[i].includes("Date") && v) displayVal = new Date(v).toLocaleDateString();
+                h += `<div class="detail-row"><span>${labels[i]}</span><b>${displayVal || '-'}</b></div>`; 
+            }});
             document.getElementById('detBody').innerHTML = h;
             document.getElementById('detTitle').innerText = type === 'cost' ? 'Design Details' : 'Order Details';
             openM('detailsModal');
         }
 
         function filterData(type) {
-            const q = document.getElementById(type === 'cost' ? 'searchCost' : 'searchOrder').value.toLowerCase();
-            const source = type === 'cost' ? cData : oData;
-            const filtered = source.filter(r => r.some(cell => cell.toString().toLowerCase().includes(q)));
-            type === 'cost' ? renderC(filtered) : renderO(filtered);
+            if(type === 'cost') {
+                const q = document.getElementById('searchCost').value.toLowerCase();
+                const filtered = cData.filter(r => r.some(cell => cell.toString().toLowerCase().includes(q)));
+                renderC(filtered);
+            } else {
+                const q = document.getElementById('searchOrder').value.toLowerCase();
+                const sF = document.getElementById('statusFilter').value;
+                const filtered = oData.filter(r => {
+                    const matchesSearch = r.some(cell => cell.toString().toLowerCase().includes(q));
+                    const matchesStatus = sF === "" || (r[13] || "Pending") === sF;
+                    return matchesSearch && matchesStatus;
+                });
+                renderO(filtered);
+            }
         }
 
         function openM(id) { document.getElementById(id).style.display='block'; }
