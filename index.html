@@ -1,271 +1,188 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Simona Pro</title>
+    <title>Simona Management Pro</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
         :root { --gold: #d4a017; --dark: #2c3e50; --green: #27ae60; --light: #f8f9fa; --red: #ff7675; }
         body { font-family: 'Segoe UI', sans-serif; margin: 0; background: var(--light); padding-bottom: 90px; }
-        
         .header { text-align: center; padding: 20px; background: white; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
         .blessing { font-style: italic; color: #95a5a6; font-size: 0.8em; display: block; }
         h1 { margin: 5px 0; color: var(--dark); font-size: 1.4em; }
-
         .navbar { position: fixed; bottom: 0; width: 100%; height: 65px; background: white; display: flex; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); z-index: 1000; }
         .nav-item { flex: 1; display: flex; align-items: center; justify-content: center; color: #7f8c8d; cursor: pointer; font-weight: bold; }
         .nav-item.active { color: var(--gold); background: #fffcf5; border-top: 3px solid var(--gold); }
-
         .container { padding: 15px; }
         .page { display: none; }
         .page.active { display: block; }
-        
         .search-box { width: 100%; padding: 15px; margin-bottom: 20px; border-radius: 25px; border: 1px solid #ddd; outline: none; box-sizing: border-box; font-size: 1rem; }
-
         .card { background: white; border-radius: 15px; padding: 20px; margin-bottom: 15px; position: relative; border-left: 6px solid var(--gold); box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-        .card h3 { margin: 0 0 5px 0; font-size: 1.2rem; }
-        .price-tag { color: var(--green); font-weight: bold; }
-
-        .btn-delete { position: absolute; top: 15px; right: 15px; background: var(--red); color: white; border: none; border-radius: 6px; padding: 6px 12px; font-weight: bold; cursor: pointer; font-size: 0.7em; }
-        
-        .top-trigger { width: 100%; padding: 15px; background: var(--dark); color: white; border: none; border-radius: 12px; font-weight: bold; margin-bottom: 20px; cursor: pointer; }
-
+        .btn-delete { position: absolute; top: 15px; right: 15px; background: var(--red); color: white; border: none; border-radius: 6px; padding: 6px 12px; cursor: pointer; font-size: 0.7em; }
+        .top-btn { width: 100%; padding: 15px; color: white; border: none; border-radius: 12px; font-weight: bold; margin-bottom: 20px; cursor: pointer; font-size: 1rem; }
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 2000; overflow-y: auto; }
-        .modal-content { background: white; width: 95%; max-width: 500px; margin: 20px auto; padding: 20px; border-radius: 20px; box-sizing: border-box; }
-        
-        /* Calculator Table Styling */
-        table { width: 100%; border-collapse: collapse; margin-bottom: 15px; font-size: 0.85em; }
-        th { background: #eee; padding: 8px; text-align: left; }
-        td { padding: 5px; }
+        .modal-content { background: white; width: 95%; max-width: 550px; margin: 20px auto; padding: 20px; border-radius: 20px; box-sizing: border-box; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 15px; font-size: 0.8em; }
+        th { background: #eee; padding: 8px; }
         input { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; }
-        
-        .calc-box { background: #f0f4f7; padding: 15px; border-radius: 10px; margin-top: 10px; }
-        .calc-row { display: flex; justify-content: space-between; margin-bottom: 5px; font-weight: bold; }
-        
-        .submit-btn { width: 100%; padding: 15px; background: var(--green); color: white; border: none; border-radius: 10px; font-weight: bold; margin-top: 15px; cursor: pointer; }
-        
-        .detail-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #eee; font-size: 0.85rem; }
+        .calc-summary { background: #f0f4f7; padding: 15px; border-radius: 10px; margin: 15px 0; }
+        .summary-line { display: flex; justify-content: space-between; font-weight: bold; margin-bottom: 5px; }
+        .profit-table tr td { padding: 5px; border-bottom: 1px solid #eee; }
     </style>
 </head>
 <body>
 
     <div class="header">
         <span class="blessing">"SHREE"</span>
-        <h1 id="title">Simona Design List</h1>
+        <h1 id="pageTitle">Simona Design List</h1>
     </div>
 
     <div class="container">
         <div id="costPage" class="page active">
-            <button class="top-trigger" onclick="openModal('costModal')">+ Open Design Calculator</button>
-            <input type="text" class="search-box" placeholder="Search Design No..." onkeyup="filterData('cost')">
-            <div id="costList">Loading...</div>
+            <button class="top-btn" style="background:var(--dark)" onclick="openM('costModal')">+ Design Calculator</button>
+            <input type="text" class="search-box" id="searchCost" placeholder="Search Design No..." onkeyup="filter('cost')">
+            <div id="costList">Loading Designs...</div>
         </div>
 
         <div id="orderPage" class="page">
-            <button class="top-trigger" style="background:var(--green)" onclick="openModal('orderModal')">+ Create New Order</button>
-            <input type="text" class="search-box" placeholder="Search Party or Design..." onkeyup="filterData('order')">
-            <div id="orderList">Loading...</div>
+            <button class="top-btn" style="background:var(--green)" onclick="openM('orderModal')">+ Create New Order</button>
+            <input type="text" class="search-box" id="searchOrder" placeholder="Search Party/Design..." onkeyup="filter('order')">
+            <div id="orderList">Loading Orders...</div>
         </div>
     </div>
 
     <div class="navbar">
-        <div class="nav-item active" id="navCost" onclick="switchPage('cost')">Cost Sheet</div>
-        <div class="nav-item" id="navOrder" onclick="switchPage('order')">Order Sheet</div>
+        <div class="nav-item active" id="navCost" onclick="switchP('cost')">Cost Sheet</div>
+        <div class="nav-item" id="navOrder" onclick="switchP('order')">Order Sheet</div>
     </div>
 
     <div id="costModal" class="modal">
         <div class="modal-content">
-            <h2 style="margin-top:0; color:var(--gold)">Design Calculator</h2>
-            <input type="text" id="c_design" placeholder="Design Number" style="margin-bottom:15px; font-weight:bold; border:2px solid var(--gold)">
-            
+            <h2 style="margin-top:0; color:var(--gold)">New Design Calculator</h2>
+            <input type="text" id="c_design" placeholder="Design No." style="margin-bottom:10px; font-weight:bold; border:2px solid var(--gold)">
             <table>
                 <tr><th>Fabric</th><th>Qty</th><th>Rate</th></tr>
-                <tr><td><input id="f1n" placeholder="F1"></td><td><input type="number" id="f1q" oninput="calc()"></td><td><input type="number" id="f1r" oninput="calc()"></td></tr>
-                <tr><td><input id="f2n" placeholder="F2"></td><td><input type="number" id="f2q" oninput="calc()"></td><td><input type="number" id="f2r" oninput="calc()"></td></tr>
-                <tr><td><input id="f3n" placeholder="F3"></td><td><input type="number" id="f3q" oninput="calc()"></td><td><input type="number" id="f3r" oninput="calc()"></td></tr>
-                <tr><td><input id="f4n" placeholder="F4"></td><td><input type="number" id="f4q" oninput="calc()"></td><td><input type="number" id="f4r" oninput="calc()"></td></tr>
-                <tr><td><input id="f5n" placeholder="F5"></td><td><input type="number" id="f5q" oninput="calc()"></td><td><input type="number" id="f5r" oninput="calc()"></td></tr>
-                <tr><td><input id="f6n" placeholder="F6"></td><td><input type="number" id="f6q" oninput="calc()"></td><td><input type="number" id="f6r" oninput="calc()"></td></tr>
+                <tbody id="fabRows">
+                    </tbody>
             </table>
-
-            <div class="grid-inputs" style="display:grid; grid-template-columns: 1fr 1fr; gap:10px">
-                <div>Dyeing: <input type="number" id="dye" oninput="calc()"></div>
-                <div>Stitch: <input type="number" id="stitch" oninput="calc()"></div>
-                <div>Hand: <input type="number" id="hand" oninput="calc()"></div>
-                <div>Pack: <input type="number" id="pack" oninput="calc()"></div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+                <div>Stitch: <input type="number" id="stitch" oninput="runCalc()"></div>
+                <div>Hand: <input type="number" id="hand" oninput="runCalc()"></div>
+                <div>Pack: <input type="number" id="pack" oninput="runCalc()"></div>
+                <div style="font-size:0.8em; color:var(--gold)">Auto Dye (₹13): <b id="res_dye">0</b></div>
             </div>
-
-            <div class="calc-box">
-                <div class="calc-row"><span>Total Fabric:</span><span id="res_fab">0</span></div>
-                <div class="calc-row" style="color:var(--red)"><span>Total Cost:</span><span id="res_total">0</span></div>
-                <div class="calc-row"><span>Wholesale:</span><input type="number" id="wholesale" oninput="calc()" style="width:80px; height:25px"></div>
-                <div class="calc-row" style="color:var(--green)"><span>Net Profit:</span><span id="res_profit">0</span></div>
+            <div class="calc-summary">
+                <div class="summary-line">Total Fabric Cost: <span id="res_f_cost">0</span></div>
+                <div class="summary-line" style="color:var(--red)">OVERALL COST: <span id="res_total">0</span></div>
             </div>
-
-            <button class="submit-btn" onclick="submitCost()">Save to Google Sheet</button>
-            <button onclick="closeModal('costModal')" style="width:100%; background:none; border:none; color:red; margin-top:10px; cursor:pointer">Cancel</button>
+            <h3>Profit Check</h3>
+            <table class="profit-table">
+                <tr style="background:#f9f9f9"><td>Wholesale Rate</td><td>Profit</td><td>%</td></tr>
+                <tr>
+                    <td><input type="number" id="wholesale" placeholder="₹" oninput="runCalc()"></td>
+                    <td id="res_profit">0</td>
+                    <td id="res_per">0%</td>
+                </tr>
+            </table>
+            <button class="top-btn" style="background:var(--green); margin-top:10px;" onclick="saveCost()">Save Design</button>
+            <button onclick="closeM('costModal')" style="width:100%; background:none; border:none; color:red; cursor:pointer">Cancel</button>
         </div>
     </div>
 
     <div id="orderModal" class="modal">
         <div class="modal-content">
-            <h2 style="margin-top:0; color:var(--green)">New Order</h2>
+            <h2 style="margin:0 0 15px 0; color:var(--green)">New Order</h2>
             <input type="text" id="o_design" placeholder="Design No.">
             <input type="text" id="party" placeholder="Party Name">
             <input type="text" id="sizes" placeholder="Sizes (e.g. 2-L, 4-XL)">
             <input type="number" id="qty" placeholder="Quantity">
-            <input type="number" id="rate" placeholder="Party Rate">
+            <input type="number" id="rate" placeholder="Rate">
             <input type="date" id="deadline">
-            <button class="submit-btn" onclick="submitOrder()">Place Order</button>
-            <button onclick="closeModal('orderModal')" style="width:100%; background:none; border:none; color:red; margin-top:10px; cursor:pointer">Cancel</button>
-        </div>
-    </div>
-
-    <div id="detailsModal" class="modal">
-        <div class="modal-content">
-            <h2 id="detTitle" style="margin-top:0; color:var(--gold)">Details</h2>
-            <div id="detBody"></div>
-            <button class="submit-btn" style="background:var(--dark)" onclick="closeModal('detailsModal')">Close</button>
+            <button class="top-btn" style="background:var(--green); margin-top:10px" onclick="saveOrder()">Save Order</button>
+            <button onclick="closeM('orderModal')" style="width:100%; background:none; border:none; color:red; cursor:pointer">Cancel</button>
         </div>
     </div>
 
     <script>
-        const mySheetUrl = "https://script.google.com/macros/s/AKfycbwEBqCAfPMsIRqaWBpkSQwM6LP_VdcugvX9OLC9o75peTgvKaN5Xc8KWU0DE10FNg8P/exec";
+        const scriptUrl = "https://script.google.com/macros/s/AKfycbz7ceBp9mI-QzizG4rxtHGcXCd0n_zhdqfovhQ7h3DEei_QqWx41RXN13XlmlJ499wMDQ/exec";
+        let cData = [], oData = [];
 
-        let costData = [];
-        let orderData = [];
-        const cLabels = ["Design No", "F1 Name", "F1 Qty", "F1 Rate", "F2 Name", "F2 Qty", "F2 Rate", "F3 Name", "F3 Qty", "F3 Rate", "F4 Name", "F4 Qty", "F4 Rate", "F5 Name", "F5 Qty", "F5 Rate", "F6 Name", "F6 Qty", "F6 Rate", "Total Fabric", "Dye Cost", "Handwork", "Stitching", "Packing", "Total Cost", "Wholesale Rate", "Total Profit"];
-        const oLabels = ["SI No", "Party Name", "Date", "Deadline", "Design", "Qty", "Sizes", "Rate", "Total", "Delivered Date", "Delivered Qty", "Invoice", "Pending", "Status"];
-
-        async function load(sheet) {
-            try {
-                const res = await fetch(`${mySheetUrl}?sheet=${encodeURIComponent(sheet)}`);
-                const json = await res.json();
-                if(sheet === "Cost Sheet") { costData = json; renderCost(json); }
-                else { orderData = json; renderOrder(json); }
-            } catch(e) { console.log("Load Error"); }
+        function switchP(p) {
+            document.getElementById('costPage').classList.toggle('active', p==='cost');
+            document.getElementById('orderPage').classList.toggle('active', p==='order');
+            document.getElementById('navCost').classList.toggle('active', p==='cost');
+            document.getElementById('navOrder').classList.toggle('active', p==='order');
+            document.getElementById('pageTitle').innerText = p==='cost' ? 'Simona Design List' : 'Simona Order List';
+            load(p==='cost' ? 'Cost Sheet' : 'OrderSheet');
         }
 
-        function calc() {
-            let fTotal = 0;
-            for(let i=1; i<=6; i++) {
-                fTotal += (Number(document.getElementById(`f${i}q`).value) * Number(document.getElementById(`f${i}r`).value));
-            }
-            const dyeing = Number(document.getElementById('dye').value);
-            const stitch = Number(document.getElementById('stitch').value);
-            const hand = Number(document.getElementById('hand').value);
-            const pack = Number(document.getElementById('pack').value);
-            const wholesale = Number(document.getElementById('wholesale').value);
-
-            const totalCost = fTotal + dyeing + stitch + hand + pack;
-            const profit = wholesale - totalCost;
-
-            document.getElementById('res_fab').innerText = fTotal.toFixed(2);
-            document.getElementById('res_total').innerText = totalCost.toFixed(2);
-            document.getElementById('res_profit').innerText = profit.toFixed(2);
+        async function load(s) {
+            const res = await fetch(`${scriptUrl}?sheet=${encodeURIComponent(s)}`);
+            const json = await res.json();
+            s === 'Cost Sheet' ? (cData = json, renderC()) : (oData = json, renderO());
         }
 
-        function renderCost(data) {
+        function renderC() {
             let h = "";
-            data.forEach((r, i) => {
-                if(r[0]) {
-                    h += `<div class="card" onclick="viewDet(${i}, 'cost')">
-                        <button class="btn-delete" onclick="event.stopPropagation(); del('${r[0]}', 'Cost Sheet')">Delete</button>
-                        <h3>${r[0]}</h3>
-                        <div class="price-tag">Wholesale: ₹${r[25] || '0'}</div>
-                    </div>`;
-                }
-            });
+            cData.forEach(r => { if(r[0]) h += `<div class="card">
+                <button class="btn-delete" onclick="del('${r[0]}','Cost Sheet')">Delete</button>
+                <h3>${r[0]}</h3><div style="color:var(--green); font-weight:bold">Wholesale: ₹${r[25]}</div></div>`; });
             document.getElementById('costList').innerHTML = h;
         }
 
-        function renderOrder(data) {
+        function renderO() {
             let h = "";
-            data.forEach((r, i) => {
-                if(r[1]) {
-                    h += `<div class="card" onclick="viewDet(${i}, 'order')">
-                        <button class="btn-delete" onclick="event.stopPropagation(); del('${r[1]}', 'OrderSheet', '${r[4]}')">Delete</button>
-                        <h3>${r[1]}</h3>
-                        <p>Design: <b>${r[4]}</b> | Total: ₹${r[8] || '0'}</p>
-                    </div>`;
-                }
-            });
-            document.getElementById('orderList').innerHTML = h || "No orders found.";
+            oData.forEach(r => { if(r[1]) h += `<div class="card">
+                <button class="btn-delete" onclick="del('${r[1]}','OrderSheet')">Delete</button>
+                <h3>${r[1]}</h3><p>Design: ${r[4]} | Qty: ${r[5]}</p></div>`; });
+            document.getElementById('orderList').innerHTML = h;
         }
 
-        function switchPage(p) {
-            document.getElementById('costPage').classList.toggle('active', p === 'cost');
-            document.getElementById('orderPage').classList.toggle('active', p === 'order');
-            document.getElementById('navCost').classList.toggle('active', p === 'cost');
-            document.getElementById('navOrder').classList.toggle('active', p === 'order');
-            document.getElementById('title').innerText = p === 'cost' ? 'Simona Design List' : 'Simona Order List';
-            load(p === 'cost' ? 'Cost Sheet' : 'OrderSheet');
+        function runCalc() {
+            let qTotal = 0, fCost = 0;
+            for(let i=1; i<=6; i++) {
+                let q = Number(document.getElementById(`f${i}q`).value)||0;
+                let r = Number(document.getElementById(`f${i}r`).value)||0;
+                qTotal += q; fCost += (q*r);
+            }
+            const dye = qTotal * 13;
+            const total = fCost + dye + (Number(document.getElementById('stitch').value)||0) + (Number(document.getElementById('hand').value)||0) + (Number(document.getElementById('pack').value)||0);
+            const wholesale = Number(document.getElementById('wholesale').value)||0;
+            const profit = wholesale - total;
+
+            document.getElementById('res_dye').innerText = "₹"+dye.toFixed(0);
+            document.getElementById('res_f_cost').innerText = "₹"+fCost.toFixed(0);
+            document.getElementById('res_total').innerText = "₹"+total.toFixed(0);
+            document.getElementById('res_profit').innerText = "₹"+profit.toFixed(0);
+            document.getElementById('res_per').innerText = total > 0 ? ((profit/total)*100).toFixed(1)+"%" : "0%";
         }
 
-        async function submitCost() {
-            const d = {
-                action: 'addCost',
-                designNo: document.getElementById('c_design').value,
-                f1n: document.getElementById('f1n').value, f1q: document.getElementById('f1q').value, f1r: document.getElementById('f1r').value,
-                f2n: document.getElementById('f2n').value, f2q: document.getElementById('f2q').value, f2r: document.getElementById('f2r').value,
-                f3n: document.getElementById('f3n').value, f3q: document.getElementById('f3q').value, f3r: document.getElementById('f3r').value,
-                f4n: document.getElementById('f4n').value, f4q: document.getElementById('f4q').value, f4r: document.getElementById('f4r').value,
-                f5n: document.getElementById('f5n').value, f5q: document.getElementById('f5q').value, f5r: document.getElementById('f5r').value,
-                f6n: document.getElementById('f6n').value, f6q: document.getElementById('f6q').value, f6r: document.getElementById('f6r').value,
-                dye: document.getElementById('dye').value,
-                stitch: document.getElementById('stitch').value,
-                hand: document.getElementById('hand').value,
-                pack: document.getElementById('pack').value,
-                wholesale: document.getElementById('wholesale').value
-            };
-            await fetch(mySheetUrl, { method: 'POST', body: JSON.stringify(d) });
-            alert("Calculator Data Saved!");
-            closeModal('costModal');
-            load('Cost Sheet');
+        async function saveCost() {
+            let d = { action: 'addCost', designNo: document.getElementById('c_design').value, stitch: document.getElementById('stitch').value, hand: document.getElementById('hand').value, pack: document.getElementById('pack').value, wholesale: document.getElementById('wholesale').value };
+            for(let i=1; i<=6; i++) { d[`f${i}n`] = document.getElementById(`f${i}n`).value; d[`f${i}q`] = document.getElementById(`f${i}q`).value; d[`f${i}r`] = document.getElementById(`f${i}r`).value; }
+            await fetch(scriptUrl, { method:'POST', body: JSON.stringify(d) });
+            closeM('costModal'); load('Cost Sheet');
         }
 
-        async function submitOrder() {
-            const d = {
-                targetSheet: 'OrderSheet',
-                designNo: document.getElementById('o_design').value,
-                partyName: document.getElementById('party').value,
-                sizeBreakdown: document.getElementById('sizes').value,
-                qty: document.getElementById('qty').value,
-                rate: document.getElementById('rate').value,
-                targetDate: document.getElementById('deadline').value
-            };
-            await fetch(mySheetUrl, { method: 'POST', body: JSON.stringify(d) });
-            alert("Order Saved!");
-            closeModal('orderModal');
-            load('OrderSheet');
+        async function saveOrder() {
+            const d = { targetSheet: 'OrderSheet', designNo: document.getElementById('o_design').value, partyName: document.getElementById('party').value, sizeBreakdown: document.getElementById('sizes').value, qty: document.getElementById('qty').value, rate: document.getElementById('rate').value, targetDate: document.getElementById('deadline').value };
+            await fetch(scriptUrl, { method:'POST', body: JSON.stringify(d) });
+            closeM('orderModal'); load('OrderSheet');
         }
 
-        async function del(id, sheet, design) {
+        async function del(id, s) {
             if(confirm(`Delete ${id}?`)) {
-                await fetch(mySheetUrl, { method: 'POST', body: JSON.stringify({action: 'delete', designNo: id, sheet: sheet, orderDesign: design}) });
-                load(sheet === 'Cost Sheet' ? 'Cost Sheet' : 'OrderSheet');
+                await fetch(scriptUrl, { method:'POST', body: JSON.stringify({action:'delete', designNo:id, sheet:s}) });
+                load(s);
             }
         }
 
-        function viewDet(idx, type) {
-            const r = (type === 'cost' ? costData : orderData)[idx];
-            const l = (type === 'cost' ? cLabels : oLabels);
-            let h = "";
-            r.forEach((v, i) => { if(l[i]) h += `<div class="detail-row"><span>${l[i]}</span><b>${v || '-'}</b></div>`; });
-            document.getElementById('detBody').innerHTML = h;
-            document.getElementById('detTitle').innerText = type === 'cost' ? 'Design Details' : 'Order Details';
-            openModal('detailsModal');
-        }
-
-        function filterData(type) {
-            const q = document.getElementById(type === 'cost' ? 'searchCost' : 'searchOrder').value.toLowerCase();
-            const source = (type === 'cost' ? costData : orderData);
-            const filtered = source.filter(r => r.some(c => c.toString().toLowerCase().includes(q)));
-            type === 'cost' ? renderCost(filtered) : renderOrder(filtered);
-        }
-
-        function openModal(id) { document.getElementById(id).style.display = 'block'; }
-        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+        function openM(id) { document.getElementById(id).style.display='block'; }
+        function closeM(id) { document.getElementById(id).style.display='none'; }
         
+        // Initializing rows
+        let fH = "";
+        for(let i=1; i<=6; i++) fH += `<tr><td><input id="f${i}n" placeholder="F${i}"></td><td><input type="number" id="f${i}q" oninput="runCalc()"></td><td><input type="number" id="f${i}r" oninput="runCalc()"></td></tr>`;
+        document.getElementById('fabRows').innerHTML = fH;
         load('Cost Sheet');
     </script>
 </body>
