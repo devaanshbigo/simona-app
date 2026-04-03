@@ -10,24 +10,21 @@
         .blessing { font-style: italic; color: #95a5a6; font-size: 0.8em; display: block; }
         h1 { margin: 5px 0; color: var(--dark); font-size: 1.4em; }
         .navbar { position: fixed; bottom: 0; width: 100%; height: 65px; background: white; display: flex; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); z-index: 1000; }
-        .nav-item { flex: 1; display: flex; align-items: center; justify-content: center; color: #7f8c8d; cursor: pointer; font-weight: bold; }
+        .nav-item { flex: 1; display: flex; align-items: center; justify-content: center; color: #7f8c8d; cursor: pointer; font-weight: bold; font-size: 0.75rem; }
         .nav-item.active { color: var(--gold); background: #fffcf5; border-top: 3px solid var(--gold); }
         .container { padding: 15px; }
         .page { display: none; }
         .page.active { display: block; }
         
         .search-box { width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 10px; border: 1px solid #ddd; outline: none; box-sizing: border-box; font-size: 0.9rem; }
-        .filter-row { display: flex; gap: 5px; margin-bottom: 20px; }
-        .filter-row select { flex: 1; padding: 8px; border-radius: 8px; border: 1px solid #ddd; font-size: 0.8rem; background: white; }
-
-        .card { background: white; border-radius: 15px; padding: 20px; margin-bottom: 15px; position: relative; border-left: 6px solid var(--gold); box-shadow: 0 4px 6px rgba(0,0,0,0.05); cursor: pointer; transition: 0.3s; }
+        .card { background: white; border-radius: 15px; padding: 20px; margin-bottom: 15px; position: relative; border-left: 6px solid var(--gold); box-shadow: 0 4px 6px rgba(0,0,0,0.05); cursor: pointer; }
         
         /* Status Colors */
-        .card.status-dye { background: #eef7ff; border-left-color: var(--blue); }
+        .card.status-dye, .card.status-sent { background: #eef7ff; border-left-color: var(--blue); }
         .card.status-handwork { background: #f9f0ff; border-left-color: var(--purple); }
         .card.status-stitching { background: #fff5eb; border-left-color: var(--orange); }
         .card.status-ready { background: #fffde0; border-left-color: #f1c40f; }
-        .card.status-delivered { background: #f0fff4; border-left-color: var(--green); }
+        .card.status-delivered, .card.status-fixed { background: #f0fff4; border-left-color: var(--green); }
 
         .btn-delete { position: absolute; top: 15px; right: 15px; background: var(--red); color: white; border: none; border-radius: 6px; padding: 6px 12px; cursor: pointer; font-size: 0.7em; z-index: 10; }
         .top-btn { width: 100%; padding: 15px; color: white; border: none; border-radius: 12px; font-weight: bold; margin-bottom: 20px; cursor: pointer; font-size: 1rem; }
@@ -35,124 +32,141 @@
         .modal-content { background: white; width: 95%; max-width: 550px; margin: 20px auto; padding: 20px; border-radius: 20px; box-sizing: border-box; }
         table { width: 100%; border-collapse: collapse; margin-bottom: 15px; font-size: 0.8em; }
         th { background: #eee; padding: 8px; }
-        input, select { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; }
+        input, select, textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; margin-bottom: 10px; font-family: inherit; }
         
         .calc-summary { background: #f0f4f7; padding: 15px; border-radius: 10px; margin: 15px 0; }
         .summary-line { display: flex; justify-content: space-between; font-weight: bold; margin-bottom: 5px; }
         .detail-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #eee; font-size: 0.9rem; }
-        
         .status-container { display: flex; align-items: center; justify-content: space-between; margin-top: 15px; padding-top: 10px; border-top: 1px dashed #ccc; }
-        .status-text { font-size: 1rem; font-weight: 800; color: var(--dark); text-transform: uppercase; letter-spacing: 1px; }
-        .status-select-small { width: 130px; font-size: 0.75em; border-color: var(--blue); }
     </style>
 </head>
 <body>
 
     <div class="header">
         <span class="blessing">"SHREE"</span>
-        <h1 id="pageTitle">SIMONA</h1>
+        <h1 id="pageTitle">Simona Design List</h1>
     </div>
 
     <div class="container">
         <div id="costPage" class="page active">
-            <button class="top-btn" style="background:var(--dark)" onclick="openM('costModal')">+ Add New Design</button>
+            <button class="top-btn" style="background:var(--dark)" onclick="openM('costModal')">+ Design Calculator</button>
             <input type="text" class="search-box" id="searchCost" placeholder="Search Design No..." onkeyup="filterData('cost')">
             <div id="costList">Loading Designs...</div>
         </div>
 
         <div id="orderPage" class="page">
             <button class="top-btn" style="background:var(--green)" onclick="openM('orderModal')">+ Create New Order</button>
-            
-            <div class="filter-row">
-                <input type="text" class="search-box" style="margin-bottom:0; flex:2;" id="searchOrder" placeholder="Search Party or Design..." onkeyup="filterData('order')">
-                <select id="statusFilter" onchange="filterData('order')">
-                    <option value="">All Status</option>
-                    <option value="Pending">Pending</option>
-                    <option value="In Dye">In Dye</option>
-                    <option value="In Handwork">In Handwork</option>
-                    <option value="In Stitching">In Stitching</option>
-                    <option value="Ready">Ready</option>
-                    <option value="Delivered">Delivered</option>
-                </select>
-            </div>
-            
+            <input type="text" class="search-box" id="searchOrder" placeholder="Search Party or Design..." onkeyup="filterData('order')">
             <div id="orderList">Loading Orders...</div>
+        </div>
+
+        <div id="alterPage" class="page">
+            <button class="top-btn" style="background:var(--orange)" onclick="openM('alterModal')">+ Log Alteration/Return</button>
+            <input type="text" class="search-box" id="searchAlter" placeholder="Search Karigar or Reason..." onkeyup="filterData('alter')">
+            <div id="alterList">Loading Alterations...</div>
         </div>
     </div>
 
     <div class="navbar">
-        <div class="nav-item active" id="navCost" onclick="switchP('cost')">Cost Sheet</div>
-        <div class="nav-item" id="navOrder" onclick="switchP('order')">Order Sheet</div>
+        <div class="nav-item active" id="navCost" onclick="switchP('cost')">Costing</div>
+        <div class="nav-item" id="navOrder" onclick="switchP('order')">Orders</div>
+        <div class="nav-item" id="navAlter" onclick="switchP('alter')">Alterations</div>
     </div>
 
-    <div id="costModal" class="modal">
+    <div id="alterModal" class="modal">
         <div class="modal-content">
-            <h2 style="margin-top:0; color:var(--gold)">New Design Calculator</h2>
-            <input type="text" id="c_design" placeholder="Design No." style="margin-bottom:10px; font-weight:bold; border:2px solid var(--gold)">
-            <table>
-                <tr><th>Fabric</th><th>Qty</th><th>Rate</th></tr>
-                <tbody id="fabRows"></tbody>
-            </table>
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
-                <div>Stitch: <input type="number" id="stitch" oninput="runCalc()"></div>
-                <div>Hand: <input type="number" id="hand" oninput="runCalc()"></div>
-                <div>Pack: <input type="number" id="pack" oninput="runCalc()"></div>
-                <div style="font-size:0.8em; color:var(--gold)">Auto Dye (₹13): <b id="res_dye">0</b></div>
-            </div>
-            <div class="calc-summary">
-                <div class="summary-line">Total Fabric Cost: <span id="res_f_cost">0</span></div>
-                <div class="summary-line" style="color:var(--red)">OVERALL COST: <span id="res_total">0</span></div>
-                <div class="summary-line">Wholesale: <input type="number" id="wholesale" style="width:70px" oninput="runCalc()"></div>
-                <div class="summary-line" style="color:var(--green)">Profit: <span id="res_profit">0</span> (<span id="res_per">0%</span>)</div>
-            </div>
-            <button class="top-btn" style="background:var(--green)" onclick="saveCost()">Save Design</button>
-            <button onclick="closeM('costModal')" style="width:100%; background:none; border:none; color:red; cursor:pointer">Cancel</button>
+            <h2 style="margin:0 0 15px 0; color:var(--orange)">Record Alteration</h2>
+            <input type="text" id="alt_karigar" placeholder="Karigar Name (e.g. M.K. Dyer)">
+            <input type="text" id="alt_item" placeholder="Item / Design No. (e.g. 23m Mal Chanderi)">
+            <input type="text" id="alt_qty" placeholder="Quantity / Meters">
+            <textarea id="alt_reason" placeholder="Reason for Alteration (e.g. Dye Defect)"></textarea>
+            <button class="top-btn" style="background:var(--orange)" onclick="saveAlter()">Save Record</button>
+            <button onclick="closeM('alterModal')" style="width:100%; background:none; border:none; color:red">Cancel</button>
         </div>
     </div>
 
-    <div id="orderModal" class="modal">
-        <div class="modal-content">
-            <h2 style="margin:0 0 15px 0; color:var(--green)">New Order</h2>
-            <input type="text" id="o_design" placeholder="Design No.">
-            <input type="text" id="party" placeholder="Party Name">
-            <input type="text" id="sizes" placeholder="Sizes (e.g. 2-L, 4-XL)">
-            <input type="number" id="qty" placeholder="Quantity">
-            <input type="number" id="rate" placeholder="Rate">
-            <input type="date" id="deadline">
-            <button class="top-btn" style="background:var(--green)" onclick="saveOrder()">Save Order</button>
-            <button onclick="closeM('orderModal')" style="width:100%; background:none; border:none; color:red; cursor:pointer">Cancel</button>
+    <div id="costModal" class="modal"><div class="modal-content">
+        <h2 style="margin-top:0; color:var(--gold)">New Design Calculator</h2>
+        <input type="text" id="c_design" placeholder="Design No." style="margin-bottom:10px; font-weight:bold; border:2px solid var(--gold)">
+        <table><tr><th>Fabric</th><th>Qty</th><th>Rate</th></tr><tbody id="fabRows"></tbody></table>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+            <div>Stitch: <input type="number" id="stitch" oninput="runCalc()"></div>
+            <div>Hand: <input type="number" id="hand" oninput="runCalc()"></div>
+            <div>Pack: <input type="number" id="pack" oninput="runCalc()"></div>
+            <div style="font-size:0.8em; color:var(--gold)">Auto Dye (₹13): <b id="res_dye">0</b></div>
         </div>
-    </div>
+        <div class="calc-summary">
+            <div class="summary-line">Total Fabric Cost: <span id="res_f_cost">0</span></div>
+            <div class="summary-line" style="color:var(--red)">OVERALL COST: <span id="res_total">0</span></div>
+            <div class="summary-line">Wholesale: <input type="number" id="wholesale" style="width:70px" oninput="runCalc()"></div>
+            <div class="summary-line" style="color:var(--green)">Profit: <span id="res_profit">0</span> (<span id="res_per">0%</span>)</div>
+        </div>
+        <button class="top-btn" style="background:var(--green)" onclick="saveCost()">Save Design</button>
+        <button onclick="closeM('costModal')" style="width:100%; background:none; border:none; color:red">Cancel</button>
+    </div></div>
 
-    <div id="detailsModal" class="modal">
-        <div class="modal-content">
-            <h2 id="detTitle" style="margin-top:0; color:var(--gold)">Details</h2>
-            <div id="detBody"></div>
-            <button class="top-btn" style="background:var(--dark); margin-top:15px;" onclick="closeM('detailsModal')">Close</button>
-        </div>
-    </div>
+    <div id="orderModal" class="modal"><div class="modal-content">
+        <h2 style="margin:0 0 15px 0; color:var(--green)">New Order</h2>
+        <input type="text" id="o_design" placeholder="Design No.">
+        <input type="text" id="party" placeholder="Party Name">
+        <input type="text" id="sizes" placeholder="Sizes">
+        <input type="number" id="qty" placeholder="Quantity">
+        <input type="number" id="rate" placeholder="Rate">
+        <input type="date" id="deadline">
+        <button class="top-btn" style="background:var(--green)" onclick="saveOrder()">Save Order</button>
+        <button onclick="closeM('orderModal')" style="width:100%; background:none; border:none; color:red">Cancel</button>
+    </div></div>
+
+    <div id="detailsModal" class="modal"><div class="modal-content">
+        <h2 id="detTitle" style="margin-top:0; color:var(--gold)">Details</h2>
+        <div id="detBody"></div>
+        <button class="top-btn" style="background:var(--dark); margin-top:15px;" onclick="closeM('detailsModal')">Close</button>
+    </div></div>
 
     <script>
-        const scriptUrl = "https://script.google.com/macros/s/AKfycbyNV8oaW700nyMfCMJKuznGFzVdbQTbrrLwVbHqkKjadPgIapvrjb9Ajkpx9oropFG6Uw/exec";
-        let cData = [], oData = [];
+        const scriptUrl = "https://script.google.com/macros/s/AKfycbw9OZE_WfRk5HaTY_GZnnoo5dQum_0hVPcb-QmKudxE_u-PMWub74PsjgfW_d2h7GK86w/exec";
+        let cData = [], oData = [], aData = [];
         const cLabels = ["Design No", "F1", "F1 Qty", "F1 Rate", "F2", "F2 Qty", "F2 Rate", "F3", "F3 Qty", "F3 Rate", "F4", "F4 Qty", "F4 Rate", "F5", "F5 Qty", "F5 Rate", "F6", "F6 Qty", "F6 Rate", "Total Fabric Qty", "Dyeing", "Handwork", "Stitching", "Packing", "Total Cost", "Wholesale", "Profit"];
         const oLabels = ["ID", "Party", "Date", "Deadline", "Design", "Qty", "Sizes", "Rate", "Total", "Del Date", "Del Qty", "Invoice", "Pending", "Status"];
+        const aLabels = ["Date Sent", "Karigar", "Item/Design", "Qty", "Reason", "Status", "Return Date"];
 
         function switchP(p) {
-            document.getElementById('costPage').classList.toggle('active', p==='cost');
-            document.getElementById('orderPage').classList.toggle('active', p==='order');
-            document.getElementById('navCost').classList.toggle('active', p==='cost');
-            document.getElementById('navOrder').classList.toggle('active', p==='order');
-            document.getElementById('pageTitle').innerText = p==='cost' ? 'Simona Design List' : 'Simona Order List';
-            load(p==='cost' ? 'Cost Sheet' : 'OrderSheet');
+            document.querySelectorAll('.page').forEach(e => e.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(e => e.classList.remove('active'));
+            document.getElementById(p+'Page').classList.add('active');
+            document.getElementById('nav'+p.charAt(0).toUpperCase()+p.slice(1)).classList.add('active');
+            const titles = {cost: 'Simona Design List', order: 'Simona Order List', alter: 'Simona Alteration Log'};
+            document.getElementById('pageTitle').innerText = titles[p];
+            load(p === 'cost' ? 'Cost Sheet' : (p === 'order' ? 'OrderSheet' : 'AlterSheet'));
         }
 
         async function load(s) {
             const res = await fetch(`${scriptUrl}?sheet=${encodeURIComponent(s)}`);
             const json = await res.json();
-            s === 'Cost Sheet' ? (cData = json, renderC(json)) : (oData = json, renderO(json));
+            if(s === 'Cost Sheet') { cData = json; renderC(json); }
+            else if(s === 'OrderSheet') { oData = json; renderO(json); }
+            else { aData = json; renderA(json); }
         }
 
+        function renderA(data) {
+            let h = "";
+            data.forEach((r, i) => { if(r[1]) {
+                const status = r[5] || 'Sent';
+                h += `<div class="card ${status === 'Fixed' ? 'status-fixed' : 'status-sent'}" onclick="viewDetails(${i}, 'alter')">
+                    <button class="btn-delete" onclick="event.stopPropagation(); del('${r[1]}','AlterSheet')">Delete</button>
+                    <h3>${r[1]} (Karigar)</h3>
+                    <p><b>Item:</b> ${r[2]} | <b>Qty:</b> ${r[3]}</p>
+                    <p style="font-size:0.8em; color:var(--red)"><b>Reason:</b> ${r[4]}</p>
+                    <div class="status-container">
+                        <span style="font-weight:bold">${status}</span>
+                        <button onclick="event.stopPropagation(); updateStatus('${r[1]}','','Fixed','AlterSheet')" style="padding:5px 10px; background:var(--green); color:white; border:none; border-radius:5px">Mark Fixed</button>
+                    </div>
+                </div>`;
+            }});
+            document.getElementById('alterList').innerHTML = h || "No records found.";
+        }
+
+        // KEEP ALL PREVIOUS RENDER FUNCTIONS
         function renderC(data) {
             let h = "";
             data.forEach((r, i) => { if(r[0]) h += `<div class="card" onclick="viewDetails(${i}, 'cost')">
@@ -161,52 +175,57 @@
             document.getElementById('costList').innerHTML = h;
         }
 
-        function getStatusClass(s) {
-            if(!s) return "";
-             if(s.includes("pending")) return "status-pending";
-            if(s.includes("Dye")) return "status-dye";
-            if(s.includes("Handwork")) return "status-handwork";
-            if(s.includes("Stitching")) return "status-stitching";
-            if(s.includes("Ready")) return "status-ready";
-            if(s.includes("Delivered")) return "status-delivered";
-            return "";
-        }
-
         function renderO(data) {
             let h = "";
-            data.forEach((r, i) => { 
-                if(r[1]) {
-                    const status = r[13] || 'Pending';
-                    const sClass = getStatusClass(status);
-                    h += `<div class="card ${sClass}" onclick="viewDetails(${i}, 'order')">
-                        <button class="btn-delete" onclick="event.stopPropagation(); del('${r[1]}','OrderSheet')">Delete</button>
-                        <h3 style="margin-bottom:5px;">${r[1]}</h3>
-                        <p style="margin:2px 0;"><b>Design:</b> ${r[4]}</p>
-                        <p style="font-size:0.8em; color:#666;"><b>Order Date:</b> ${new Date(r[2]).toLocaleDateString()}</p>
-                        
-                        <div class="status-container">
-                            <span class="status-text">${status}</span>
-                            <select class="status-select-small" onclick="event.stopPropagation()" onchange="updateStatus('${r[1]}','${r[4]}', this.value)">
-                                <option value="">Update Stage...</option>
-                                <option value="In Dye">In Dye</option>
-                                <option value="In Handwork">In Handwork</option>
-                                <option value="In Stitching">In Stitching</option>
-                                <option value="Ready">Ready</option>
-                                <option value="Delivered">Delivered</option>
-                            </select>
-                        </div>
-                    </div>`; 
-                }
-            });
+            data.forEach((r, i) => { if(r[1]) {
+                const status = r[13] || 'Pending';
+                const sClass = status.includes("Dye") ? "status-dye" : status.includes("Handwork") ? "status-handwork" : status.includes("Stitching") ? "status-stitching" : status.includes("Ready") ? "status-ready" : status.includes("Delivered") ? "status-delivered" : "";
+                h += `<div class="card ${sClass}" onclick="viewDetails(${i}, 'order')">
+                    <button class="btn-delete" onclick="event.stopPropagation(); del('${r[1]}','OrderSheet')">Delete</button>
+                    <h3 style="margin-bottom:5px;">${r[1]}</h3>
+                    <p style="margin:2px 0;"><b>Design:</b> ${r[4]}</p>
+                    <div class="status-container"><span class="status-text">${status}</span>
+                    <select class="status-select-small" onclick="event.stopPropagation()" onchange="updateStatus('${r[1]}','${r[4]}', this.value, 'OrderSheet')">
+                        <option value="">Update...</option><option value="In Dye">In Dye</option><option value="In Handwork">In Handwork</option><option value="In Stitching">In Stitching</option><option value="Ready">Ready</option><option value="Delivered">Delivered</option>
+                    </select></div></div>`; 
+            }});
             document.getElementById('orderList').innerHTML = h;
         }
 
-        async function updateStatus(party, design, newVal) {
-            if(!newVal) return;
-            await fetch(scriptUrl, { method:'POST', body: JSON.stringify({action:'updateStatus', party:party, design:design, newStatus:newVal}) });
-            load('OrderSheet');
+        async function saveAlter() {
+            const d = { action:'addAlter', karigar:document.getElementById('alt_karigar').value, item:document.getElementById('alt_item').value, qty:document.getElementById('alt_qty').value, reason:document.getElementById('alt_reason').value };
+            await fetch(scriptUrl, { method:'POST', body: JSON.stringify(d) });
+            closeM('alterModal'); switchP('alter');
         }
 
+        async function updateStatus(name, design, newVal, sheet) {
+            if(!newVal) return;
+            await fetch(scriptUrl, { method:'POST', body: JSON.stringify({action:'updateStatus', name:name, design:design, newStatus:newVal, sheet:sheet}) });
+            load(sheet);
+        }
+
+        async function del(id, s) {
+            if(confirm(`Delete ${id}?`)) {
+                await fetch(scriptUrl, { method:'POST', body: JSON.stringify({action:'delete', id:id, sheet:s}) });
+                load(s);
+            }
+        }
+
+        function viewDetails(idx, type) {
+            const dataMap = {cost: [cData, cLabels, 'Design Details'], order: [oData, oLabels, 'Order Details'], alter: [aData, aLabels, 'Alteration Details']};
+            const [data, labels, title] = dataMap[type];
+            let h = "";
+            data[idx].forEach((v, i) => { if(labels[i]) {
+                let displayVal = v;
+                if(labels[i].includes("Date") && v) displayVal = new Date(v).toLocaleDateString();
+                h += `<div class="detail-row"><span>${labels[i]}</span><b>${displayVal || '-'}</b></div>`; 
+            }});
+            document.getElementById('detBody').innerHTML = h;
+            document.getElementById('detTitle').innerText = title;
+            openM('detailsModal');
+        }
+
+        // RUN CALC & SAVE COST FUNCTIONS UNTOUCHED
         function runCalc() {
             let qTotal = 0, fCost = 0;
             for(let i=1; i<=6; i++) {
@@ -216,8 +235,7 @@
             }
             const dye = qTotal * 13;
             const total = fCost + dye + (Number(document.getElementById('stitch').value)||0) + (Number(document.getElementById('hand').value)||0) + (Number(document.getElementById('pack').value)||0);
-            const wholesale = Number(document.getElementById('wholesale').value)||0;
-            const profit = wholesale - total;
+            const profit = (Number(document.getElementById('wholesale').value)||0) - total;
             document.getElementById('res_dye').innerText = "₹"+dye.toFixed(0);
             document.getElementById('res_f_cost').innerText = "₹"+fCost.toFixed(0);
             document.getElementById('res_total').innerText = "₹"+total.toFixed(0);
@@ -238,42 +256,12 @@
             closeM('orderModal'); load('OrderSheet');
         }
 
-        async function del(id, s) {
-            if(confirm(`Delete ${id}?`)) {
-                await fetch(scriptUrl, { method:'POST', body: JSON.stringify({action:'delete', designNo:id, sheet:s}) });
-                load(s);
-            }
-        }
-
-        function viewDetails(idx, type) {
-            const labels = type === 'cost' ? cLabels : oLabels;
-            const row = type === 'cost' ? cData[idx] : oData[idx];
-            let h = "";
-            row.forEach((v, i) => { if(labels[i]) {
-                let displayVal = v;
-                if(labels[i].includes("Date") && v) displayVal = new Date(v).toLocaleDateString();
-                h += `<div class="detail-row"><span>${labels[i]}</span><b>${displayVal || '-'}</b></div>`; 
-            }});
-            document.getElementById('detBody').innerHTML = h;
-            document.getElementById('detTitle').innerText = type === 'cost' ? 'Design Details' : 'Order Details';
-            openM('detailsModal');
-        }
-
         function filterData(type) {
-            if(type === 'cost') {
-                const q = document.getElementById('searchCost').value.toLowerCase();
-                const filtered = cData.filter(r => r.some(cell => cell.toString().toLowerCase().includes(q)));
-                renderC(filtered);
-            } else {
-                const q = document.getElementById('searchOrder').value.toLowerCase();
-                const sF = document.getElementById('statusFilter').value;
-                const filtered = oData.filter(r => {
-                    const matchesSearch = r.some(cell => cell.toString().toLowerCase().includes(q));
-                    const matchesStatus = sF === "" || (r[13] || "Pending") === sF;
-                    return matchesSearch && matchesStatus;
-                });
-                renderO(filtered);
-            }
+            const searchId = type === 'cost' ? 'searchCost' : (type === 'order' ? 'searchOrder' : 'searchAlter');
+            const q = document.getElementById(searchId).value.toLowerCase();
+            if(type === 'cost') renderC(cData.filter(r => r[0].toString().toLowerCase().includes(q)));
+            else if(type === 'order') renderO(oData.filter(r => r[1].toLowerCase().includes(q) || r[4].toString().toLowerCase().includes(q)));
+            else renderA(aData.filter(r => r[1].toLowerCase().includes(q) || r[4].toLowerCase().includes(q)));
         }
 
         function openM(id) { document.getElementById(id).style.display='block'; }
