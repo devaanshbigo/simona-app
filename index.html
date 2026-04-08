@@ -16,14 +16,32 @@
         .page.active { display: block; }
         .search-box { width: 100%; padding: 15px; margin-bottom: 15px; border-radius: 12px; border: 1px solid #ddd; box-sizing: border-box; }
         .top-btn { width: 100%; padding: 18px; color: white; border: none; border-radius: 15px; font-weight: bold; margin-bottom: 20px; cursor: pointer; }
-        .card { background: white; border-radius: 18px; padding: 20px; margin-bottom: 15px; position: relative; border-left: 8px solid var(--gold); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .card { background: white; border-radius: 18px; padding: 20px; margin-bottom: 15px; position: relative; border-left: 8px solid var(--gold); box-shadow: 0 4px 12px rgba(0,0,0,0.05); cursor: pointer; transition: transform 0.18s ease, box-shadow 0.18s ease; }
+        .card:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(0,0,0,0.08); }
+        .card-meta { color: #7f8c8d; font-size: 0.92em; margin-top: 8px; }
+        .card-hint { margin-top: 12px; color: var(--gold); font-size: 0.85em; font-weight: bold; }
         .btn-delete { position: absolute; top: 15px; right: 15px; background: #ffeaea; color: var(--red); border: none; border-radius: 8px; padding: 8px 12px; font-weight: bold; cursor: pointer; }
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; overflow-y: auto; }
-        .modal-content { background: white; width: 92%; max-width: 500px; margin: 30px auto; padding: 25px; border-radius: 25px; box-sizing: border-box; }
+        .modal { display: none; position: fixed; inset: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; overflow-y: auto; }
+        .modal-content { background: white; width: 92%; max-width: 520px; margin: 30px auto; padding: 25px; border-radius: 25px; box-sizing: border-box; }
+        .detail-modal-content { max-width: 720px; }
         input, select { width: 100%; padding: 12px; border: 1.5px solid #eee; border-radius: 10px; box-sizing: border-box; margin-bottom: 10px; }
         .calc-grid { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 8px; margin-bottom: 5px; }
         .inline-btn { padding: 10px 14px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; background: var(--orange); color: white; }
         .empty-state { background: white; border-radius: 18px; padding: 20px; text-align: center; color: #7f8c8d; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .detail-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 18px; }
+        .detail-title { margin: 0; color: var(--dark); }
+        .detail-subtitle { color: #7f8c8d; font-size: 0.92em; margin-top: 6px; }
+        .detail-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 18px; }
+        .detail-item { background: #faf7ef; border-radius: 14px; padding: 14px; }
+        .detail-label { color: #7f8c8d; font-size: 0.85em; margin-bottom: 6px; }
+        .detail-value { color: var(--dark); font-weight: 600; word-break: break-word; }
+        .detail-section { margin-top: 18px; }
+        .detail-section h3 { margin-bottom: 10px; color: var(--dark); }
+        .line-list { display: grid; gap: 10px; }
+        .line-item { background: #f8f9fa; border-radius: 14px; padding: 12px 14px; display: flex; justify-content: space-between; gap: 10px; }
+        .line-item strong { color: var(--dark); }
+        .close-btn { background: #f4f4f4; color: var(--dark); border: none; border-radius: 10px; padding: 10px 14px; cursor: pointer; font-weight: bold; }
+        .detail-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 18px; flex-wrap: wrap; }
     </style>
 </head>
 <body>
@@ -96,8 +114,12 @@
         <button class="top-btn" style="background: var(--orange);" onclick="saveAlter()">LOG & SEND</button>
     </div></div>
 
+    <div id="detailModal" class="modal"><div class="modal-content detail-modal-content">
+        <div id="detailBody"></div>
+    </div></div>
+
     <script>
-        const scriptUrl = "https://script.google.com/macros/s/AKfycbyS40WJOusZbXLxFllM9KrK0Lm6LKchCZnIZqX8ly-rEe0hU8pNm7sl2iNJitTUiH6rJA/exec";
+        const scriptUrl = "https://script.google.com/macros/s/AKfycbw735TvAitE_0Nqr7KGK2IaK2Ta08jjiunBfpFI0Lvx_TQEpdyAXTzDTCQ0n6VoNSPszA/exec";
         const CURRENCY = "₹";
         let cData = [], oData = [], aData = [];
 
@@ -121,6 +143,35 @@
             document.getElementById(containerId).innerHTML = `<div class="empty-state">${escapeHtml(message)}</div>`;
         }
 
+        function safeText(value, fallback = "-") {
+            const text = String(value ?? "").trim();
+            return text ? text : fallback;
+        }
+
+        function safeNumber(value, fallback = 0) {
+            const num = Number(value);
+            return Number.isFinite(num) ? num : fallback;
+        }
+
+        function formatCurrency(value) {
+            return CURRENCY + safeNumber(value, 0);
+        }
+
+        function formatDate(value) {
+            if (!value) return "-";
+            const date = new Date(value);
+            if (Number.isNaN(date.getTime())) return safeText(value);
+            return date.toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
+        }
+
+        function createDetailItem(label, value) {
+            return `<div class="detail-item"><div class="detail-label">${escapeHtml(label)}</div><div class="detail-value">${escapeHtml(value)}</div></div>`;
+        }
+
+        function createLineItem(title, rightText) {
+            return `<div class="line-item"><strong>${escapeHtml(title)}</strong><span>${escapeHtml(rightText)}</span></div>`;
+        }
+
         async function requestJson(sheet) {
             const res = await fetch(`${scriptUrl}?sheet=${encodeURIComponent(sheet)}`);
             if (!res.ok) throw new Error(`Load failed (${res.status})`);
@@ -134,7 +185,6 @@
                 headers: { "Content-Type": "text/plain;charset=utf-8" },
                 body: JSON.stringify(payload)
             });
-
             if (!res.ok) throw new Error(`Save failed (${res.status})`);
             return res.text();
         }
@@ -160,15 +210,118 @@
             }
         }
 
+        function openCostDetail(index) {
+            const r = cData[index];
+            if (!r) return;
+
+            const fabrics = [];
+            for (let i = 0; i < 6; i++) {
+                const base = i * 3 + 1;
+                const name = safeText(r[base], "");
+                const qty = safeNumber(r[base + 1], 0);
+                const rate = safeNumber(r[base + 2], 0);
+                if (name || qty || rate) fabrics.push({ name: name || `Fabric ${i + 1}`, qty, rate, total: qty * rate });
+            }
+
+            const fabricsHtml = fabrics.length
+                ? fabrics.map(item => createLineItem(`${item.name} | Qty: ${item.qty}`, `${formatCurrency(item.rate)} rate | ${formatCurrency(item.total)} total`)).join("")
+                : `<div class="empty-state">No fabric breakdown available.</div>`;
+
+            document.getElementById("detailBody").innerHTML = `
+                <div class="detail-header">
+                    <div>
+                        <h2 class="detail-title">${escapeHtml(safeText(r[0]))}</h2>
+                        <div class="detail-subtitle">Complete costing detail</div>
+                    </div>
+                    <button class="close-btn" onclick="closeM('detailModal')">Close</button>
+                </div>
+                <div class="detail-grid">
+                    ${createDetailItem("Total Qty", safeText(r[19]))}
+                    ${createDetailItem("Dyeing", formatCurrency(r[20]))}
+                    ${createDetailItem("Handwork", formatCurrency(r[21]))}
+                    ${createDetailItem("Stitching", formatCurrency(r[22]))}
+                    ${createDetailItem("Packing", formatCurrency(r[23]))}
+                    ${createDetailItem("Final Cost", formatCurrency(r[24]))}
+                    ${createDetailItem("Wholesale", formatCurrency(r[25]))}
+                    ${createDetailItem("Profit", formatCurrency(r[26]))}
+                </div>
+                <div class="detail-section">
+                    <h3>Fabric Breakdown</h3>
+                    <div class="line-list">${fabricsHtml}</div>
+                </div>
+            `;
+            openM("detailModal");
+        }
+
+        function openOrderDetail(index) {
+            const r = oData[index];
+            if (!r) return;
+
+            document.getElementById("detailBody").innerHTML = `
+                <div class="detail-header">
+                    <div>
+                        <h2 class="detail-title">${escapeHtml(safeText(r[1]))}</h2>
+                        <div class="detail-subtitle">Order detail for design ${escapeHtml(safeText(r[4]))}</div>
+                    </div>
+                    <button class="close-btn" onclick="closeM('detailModal')">Close</button>
+                </div>
+                <div class="detail-grid">
+                    ${createDetailItem("Party Name", safeText(r[1]))}
+                    ${createDetailItem("Design No", safeText(r[4]))}
+                    ${createDetailItem("Order Date", formatDate(r[0]))}
+                    ${createDetailItem("Target Date", formatDate(r[3]))}
+                    ${createDetailItem("Total Qty", safeText(r[5]))}
+                    ${createDetailItem("Rate", formatCurrency(r[7]))}
+                    ${createDetailItem("Amount", formatCurrency(r[8]))}
+                    ${createDetailItem("Status", safeText(r[13], "Pending"))}
+                </div>
+                <div class="detail-section">
+                    <h3>Size Breakdown</h3>
+                    <div class="detail-item">
+                        <div class="detail-value">${escapeHtml(safeText(r[6]))}</div>
+                    </div>
+                </div>
+            `;
+            openM("detailModal");
+        }
+
+        function openAlterDetail(index) {
+            const r = aData[index];
+            if (!r) return;
+
+            document.getElementById("detailBody").innerHTML = `
+                <div class="detail-header">
+                    <div>
+                        <h2 class="detail-title">${escapeHtml(safeText(r[1]))}</h2>
+                        <div class="detail-subtitle">Alteration detail for ${escapeHtml(safeText(r[2]))}</div>
+                    </div>
+                    <button class="close-btn" onclick="closeM('detailModal')">Close</button>
+                </div>
+                <div class="detail-grid">
+                    ${createDetailItem("Karigar", safeText(r[1]))}
+                    ${createDetailItem("Design / Item", safeText(r[2]))}
+                    ${createDetailItem("Qty", safeText(r[3]))}
+                    ${createDetailItem("Reason", safeText(r[4]))}
+                    ${createDetailItem("Status", safeText(r[5]))}
+                    ${createDetailItem("Logged On", formatDate(r[0]))}
+                    ${createDetailItem("Fixed On", formatDate(r[6]))}
+                </div>
+            `;
+            openM("detailModal");
+        }
+
         function renderC(data) {
             let h = "";
-            data.forEach(r => {
+            data.forEach((r, index) => {
                 if (r[0]) {
                     const design = escapeInlineParam(r[0]);
-                    h += `<div class="card">
-                        <button class="btn-delete" onclick="delCost('${design}')">Delete</button>
+                    h += `<div class="card" onclick="openCostDetail(${index})">
+                        <button class="btn-delete" onclick="event.stopPropagation(); delCost('${design}')">Delete</button>
                         <h3>${escapeHtml(r[0])}</h3>
-                        <p>Profit: ${CURRENCY}${escapeHtml(r[26] ?? 0)}</p>
+                        <div class="card-meta">Final Cost: ${escapeHtml(formatCurrency(r[24]))}</div>
+                        <div class="card-meta">Wholesale: ${escapeHtml(formatCurrency(r[25]))}</div>
+                        <div class="card-meta">Profit: ${escapeHtml(formatCurrency(r[26]))}</div>
+                        <div class="card-hint">Tap to view full costing</div>
                     </div>`;
                 }
             });
@@ -177,19 +330,22 @@
 
         function renderO(data) {
             let h = "";
-            data.forEach(r => {
+            data.forEach((r, index) => {
                 if (r[1] || r[4]) {
                     const party = escapeInlineParam(r[1]);
                     const design = escapeInlineParam(r[4]);
-                    h += `<div class="card">
-                        <button class="btn-delete" onclick="delOrder('${party}','${design}')">Delete</button>
-                        <h3>${escapeHtml(r[1] ?? "")}</h3>
-                        <p>Design: ${escapeHtml(r[4] ?? "")} | Qty: ${escapeHtml(r[5] ?? 0)} | Status: ${escapeHtml(r[13] ?? "Pending")}</p>
-                        <select onchange="updStatus('${party}','${design}',this.value,'OrderSheet')">
+                    h += `<div class="card" onclick="openOrderDetail(${index})">
+                        <button class="btn-delete" onclick="event.stopPropagation(); delOrder('${party}','${design}')">Delete</button>
+                        <h3>${escapeHtml(safeText(r[1], 'Unnamed Party'))}</h3>
+                        <div class="card-meta">Design: ${escapeHtml(safeText(r[4]))}</div>
+                        <div class="card-meta">Qty: ${escapeHtml(safeText(r[5]))} | Amount: ${escapeHtml(formatCurrency(r[8]))}</div>
+                        <div class="card-meta">Status: ${escapeHtml(safeText(r[13], 'Pending'))}</div>
+                        <select onclick="event.stopPropagation()" onchange="event.stopPropagation(); updStatus('${party}','${design}',this.value,'OrderSheet')">
                             <option value="">Update</option>
                             <option value="Ready">Ready</option>
                             <option value="Delivered">Delivered</option>
                         </select>
+                        <div class="card-hint">Tap to view full order</div>
                     </div>`;
                 }
             });
@@ -198,15 +354,17 @@
 
         function renderA(data) {
             let h = "";
-            data.forEach(r => {
+            data.forEach((r, index) => {
                 if (r[1]) {
                     const karigar = escapeInlineParam(r[1]);
                     const item = escapeInlineParam(r[2]);
-                    h += `<div class="card">
-                        <button class="btn-delete" onclick="delAlter('${karigar}','${item}')">Delete</button>
+                    h += `<div class="card" onclick="openAlterDetail(${index})">
+                        <button class="btn-delete" onclick="event.stopPropagation(); delAlter('${karigar}','${item}')">Delete</button>
                         <h3>${escapeHtml(r[1])}</h3>
-                        <p>${escapeHtml(r[2])} (${escapeHtml(r[3] ?? 0)} pcs) - ${escapeHtml(r[5] ?? "Pending")}</p>
-                        <button class="inline-btn" onclick="updStatus('${karigar}','${item}','Fixed','AlterSheet')">Mark Fixed</button>
+                        <div class="card-meta">Item: ${escapeHtml(safeText(r[2]))}</div>
+                        <div class="card-meta">Qty: ${escapeHtml(safeText(r[3]))} | Status: ${escapeHtml(safeText(r[5]))}</div>
+                        <button class="inline-btn" onclick="event.stopPropagation(); updStatus('${karigar}','${item}','Fixed','AlterSheet')">Mark Fixed</button>
+                        <div class="card-hint">Tap to view full alteration</div>
                     </div>`;
                 }
             });
@@ -216,26 +374,16 @@
         function runCalc() {
             let totalQty = 0;
             let fabCost = 0;
-
             for (let i = 1; i <= 6; i++) {
                 const q = Number(document.getElementById("f" + i + "q").value) || 0;
                 const r = Number(document.getElementById("f" + i + "r").value) || 0;
                 totalQty += q;
                 fabCost += q * r;
             }
-
             const dye = totalQty * 13;
             document.getElementById("dye_disp").innerText = CURRENCY + dye;
-
-            const finalCost =
-                fabCost +
-                dye +
-                (Number(document.getElementById("stitch").value) || 0) +
-                (Number(document.getElementById("hand").value) || 0) +
-                (Number(document.getElementById("pack").value) || 0);
-
-            document.getElementById("res").innerText =
-                "Profit: " + CURRENCY + (Number(document.getElementById("wholesale").value) - finalCost).toFixed(0);
+            const finalCost = fabCost + dye + (Number(document.getElementById("stitch").value) || 0) + (Number(document.getElementById("hand").value) || 0) + (Number(document.getElementById("pack").value) || 0);
+            document.getElementById("res").innerText = "Profit: " + CURRENCY + (Number(document.getElementById("wholesale").value) - finalCost).toFixed(0);
         }
 
         function resetFields(ids) {
@@ -256,7 +404,6 @@
                     sizeBreakdown: document.getElementById("sizes").value,
                     targetDate: document.getElementById("deadline").value
                 });
-
                 resetFields(["o_design", "party", "sizes", "qty", "rate", "deadline"]);
                 closeM("orderModal");
                 await load("OrderSheet");
@@ -293,15 +440,9 @@
                 pack: document.getElementById("pack").value,
                 wholesale: document.getElementById("wholesale").value
             };
-
             try {
                 await postData(payload);
-                resetFields([
-                    "c_design", "f1n", "f1q", "f1r", "f2n", "f2q", "f2r",
-                    "f3n", "f3q", "f3r", "f4n", "f4q", "f4r",
-                    "f5n", "f5q", "f5r", "f6n", "f6q", "f6r",
-                    "stitch", "hand", "pack", "wholesale"
-                ]);
+                resetFields(["c_design", "f1n", "f1q", "f1r", "f2n", "f2q", "f2r", "f3n", "f3q", "f3r", "f4n", "f4q", "f4r", "f5n", "f5q", "f5r", "f6n", "f6q", "f6r", "stitch", "hand", "pack", "wholesale"]);
                 runCalc();
                 closeM("costModal");
                 await load("Cost Sheet");
@@ -320,7 +461,6 @@
                     qty: document.getElementById("alt_q").value,
                     reason: document.getElementById("alt_r").value
                 });
-
                 resetFields(["alt_k", "alt_d", "alt_q", "alt_r"]);
                 closeM("alterModal");
                 await load("AlterSheet");
@@ -333,12 +473,7 @@
         async function delOrder(party, design) {
             if (confirm("Delete?")) {
                 try {
-                    await postData({
-                        action: "delete",
-                        id: party,
-                        designNo: design,
-                        sheet: "OrderSheet"
-                    });
+                    await postData({ action: "delete", id: party, designNo: design, sheet: "OrderSheet" });
                     await load("OrderSheet");
                 } catch (err) {
                     console.error(err);
@@ -350,12 +485,7 @@
         async function delCost(design) {
             if (confirm("Delete?")) {
                 try {
-                    await postData({
-                        action: "delete",
-                        id: design,
-                        designNo: design,
-                        sheet: "Cost Sheet"
-                    });
+                    await postData({ action: "delete", id: design, designNo: design, sheet: "Cost Sheet" });
                     await load("Cost Sheet");
                 } catch (err) {
                     console.error(err);
@@ -367,12 +497,7 @@
         async function delAlter(karigar, item) {
             if (confirm("Delete?")) {
                 try {
-                    await postData({
-                        action: "delete",
-                        sheet: "AlterSheet",
-                        karigar: karigar,
-                        item: item
-                    });
+                    await postData({ action: "delete", sheet: "AlterSheet", karigar: karigar, item: item });
                     await load("AlterSheet");
                 } catch (err) {
                     console.error(err);
@@ -383,15 +508,8 @@
 
         async function updStatus(party, design, status, sheet) {
             if (!status) return;
-
             try {
-                await postData({
-                    action: "updateStatus",
-                    party: party,
-                    design: design,
-                    newStatus: status,
-                    targetSheet: sheet
-                });
+                await postData({ action: "updateStatus", party: party, design: design, newStatus: status, targetSheet: sheet });
                 await load(sheet);
             } catch (err) {
                 console.error(err);
@@ -402,21 +520,12 @@
         function filter(type) {
             const inputId = "search" + type.charAt(0).toUpperCase() + type.slice(1);
             const query = document.getElementById(inputId).value.trim().toLowerCase();
-
             if (type === "cost") {
                 renderC(cData.filter(r => String(r[0] ?? "").toLowerCase().includes(query)));
             } else if (type === "order") {
-                renderO(oData.filter(r =>
-                    [r[1], r[4], r[13]].some(value =>
-                        String(value ?? "").toLowerCase().includes(query)
-                    )
-                ));
+                renderO(oData.filter(r => [r[1], r[4], r[13]].some(value => String(value ?? "").toLowerCase().includes(query))));
             } else {
-                renderA(aData.filter(r =>
-                    [r[1], r[2], r[5]].some(value =>
-                        String(value ?? "").toLowerCase().includes(query)
-                    )
-                ));
+                renderA(aData.filter(r => [r[1], r[2], r[5]].some(value => String(value ?? "").toLowerCase().includes(query))));
             }
         }
 
