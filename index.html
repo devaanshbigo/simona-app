@@ -2,6 +2,7 @@
 <html>
 <head>
     <title>Simona Management</title>
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
         :root { --gold: #d4a017; --dark: #2c3e50; --green: #27ae60; --light: #f8f9fa; --red: #ff7675; --orange: #e67e22; }
@@ -21,6 +22,8 @@
         .modal-content { background: white; width: 92%; max-width: 500px; margin: 30px auto; padding: 25px; border-radius: 25px; box-sizing: border-box; }
         input, select { width: 100%; padding: 12px; border: 1.5px solid #eee; border-radius: 10px; box-sizing: border-box; margin-bottom: 10px; }
         .calc-grid { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 8px; margin-bottom: 5px; }
+        .inline-btn { padding: 10px 14px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; background: var(--orange); color: white; }
+        .empty-state { background: white; border-radius: 18px; padding: 20px; text-align: center; color: #7f8c8d; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
     </style>
 </head>
 <body>
@@ -75,92 +78,371 @@
 
     <div id="orderModal" class="modal"><div class="modal-content">
         <h2>Book Order</h2>
-        <input type="text" id="o_design" placeholder="Design No"><input type="text" id="party" placeholder="Party Name">
-        <input type="text" id="sizes" placeholder="Sizes (e.g. 38:2, 40:4)"><input type="number" id="qty" placeholder="Total Qty">
-        <input type="number" id="rate" placeholder="Rate"><input type="date" id="deadline">
+        <input type="text" id="o_design" placeholder="Design No">
+        <input type="text" id="party" placeholder="Party Name">
+        <input type="text" id="sizes" placeholder="Sizes (e.g. 38:2, 40:4)">
+        <input type="number" id="qty" placeholder="Total Qty">
+        <input type="number" id="rate" placeholder="Rate">
+        <input type="date" id="deadline">
         <button class="top-btn" style="background: var(--green);" onclick="saveOrder()">BOOK NOW</button>
     </div></div>
 
     <div id="alterModal" class="modal"><div class="modal-content">
         <h2>Alteration Log</h2>
-        <input type="text" id="alt_k" placeholder="Karigar Name"><input type="text" id="alt_d" placeholder="Design/Item Name">
-        <input type="number" id="alt_q" placeholder="Qty"><input type="text" id="alt_r" placeholder="Reason">
+        <input type="text" id="alt_k" placeholder="Karigar Name">
+        <input type="text" id="alt_d" placeholder="Design/Item Name">
+        <input type="number" id="alt_q" placeholder="Qty">
+        <input type="text" id="alt_r" placeholder="Reason">
         <button class="top-btn" style="background: var(--orange);" onclick="saveAlter()">LOG & SEND</button>
     </div></div>
 
     <script>
-        const scriptUrl = "https://script.google.com/macros/s/AKfycbw735TvAitE_0Nqr7KGK2IaK2Ta08jjiunBfpFI0Lvx_TQEpdyAXTzDTCQ0n6VoNSPszA/exec";
+        const scriptUrl = "https://script.google.com/macros/s/AKfycbyS40WJOusZbXLxFllM9KrK0Lm6LKchCZnIZqX8ly-rEe0hU8pNm7sl2iNJitTUiH6rJA/exec";
+        const CURRENCY = "₹";
         let cData = [], oData = [], aData = [];
 
-        async function load(s) {
-            const res = await fetch(`${scriptUrl}?sheet=${encodeURIComponent(s)}`);
+        function escapeHtml(value) {
+            return String(value ?? "").replace(/[&<>"']/g, ch => ({
+                "&": "&amp;",
+                "<": "&lt;",
+                ">": "&gt;",
+                '"': "&quot;",
+                "'": "&#39;"
+            }[ch]));
+        }
+
+        function escapeInlineParam(value) {
+            return String(value ?? "")
+                .replace(/\\/g, "\\\\")
+                .replace(/'/g, "\\'");
+        }
+
+        function showMessage(containerId, message) {
+            document.getElementById(containerId).innerHTML = `<div class="empty-state">${escapeHtml(message)}</div>`;
+        }
+
+        async function requestJson(sheet) {
+            const res = await fetch(`${scriptUrl}?sheet=${encodeURIComponent(sheet)}`);
+            if (!res.ok) throw new Error(`Load failed (${res.status})`);
             const json = await res.json();
-            if(s === "Cost Sheet") { cData = json; renderC(json); }
-            else if(s === "OrderSheet") { oData = json; renderO(json); }
-            else { aData = json; renderA(json); }
+            return Array.isArray(json) ? json : [];
+        }
+
+        async function postData(payload) {
+            const res = await fetch(scriptUrl, {
+                method: "POST",
+                headers: { "Content-Type": "text/plain;charset=utf-8" },
+                body: JSON.stringify(payload)
+            });
+
+            if (!res.ok) throw new Error(`Save failed (${res.status})`);
+            return res.text();
+        }
+
+        async function load(sheet) {
+            try {
+                const json = await requestJson(sheet);
+                if (sheet === "Cost Sheet") {
+                    cData = json;
+                    renderC(json);
+                } else if (sheet === "OrderSheet") {
+                    oData = json;
+                    renderO(json);
+                } else {
+                    aData = json;
+                    renderA(json);
+                }
+            } catch (err) {
+                console.error(err);
+                if (sheet === "Cost Sheet") showMessage("costList", "Could not load costing data right now.");
+                else if (sheet === "OrderSheet") showMessage("orderList", "Could not load order data right now.");
+                else showMessage("alterList", "Could not load alteration data right now.");
+            }
         }
 
         function renderC(data) {
             let h = "";
-            data.forEach(r => { if(r[0]) h += `<div class="card"><button class="btn-delete" onclick="del('${r[0]}','Cost Sheet')">Delete</button><h3>${r[0]}</h3><p>Profit: ₹${r[26]}</p></div>`; });
-            document.getElementById('costList').innerHTML = h;
+            data.forEach(r => {
+                if (r[0]) {
+                    const design = escapeInlineParam(r[0]);
+                    h += `<div class="card">
+                        <button class="btn-delete" onclick="delCost('${design}')">Delete</button>
+                        <h3>${escapeHtml(r[0])}</h3>
+                        <p>Profit: ${CURRENCY}${escapeHtml(r[26] ?? 0)}</p>
+                    </div>`;
+                }
+            });
+            document.getElementById("costList").innerHTML = h || `<div class="empty-state">No designs found.</div>`;
         }
 
         function renderO(data) {
             let h = "";
-            data.forEach(r => { if(r[1]) h += `<div class="card"><button class="btn-delete" onclick="del('${r[1]}','OrderSheet')">Delete</button><h3>${r[1]}</h3><p>Design: ${r[4]} | Qty: ${r[5]} | Status: ${r[13]}</p><select onchange="updStatus('${r[1]}','${r[4]}',this.value,'OrderSheet')"><option value="">Update</option><option value="Ready">Ready</option><option value="Delivered">Delivered</option></select></div>`; });
-            document.getElementById('orderList').innerHTML = h;
+            data.forEach(r => {
+                if (r[1] || r[4]) {
+                    const party = escapeInlineParam(r[1]);
+                    const design = escapeInlineParam(r[4]);
+                    h += `<div class="card">
+                        <button class="btn-delete" onclick="delOrder('${party}','${design}')">Delete</button>
+                        <h3>${escapeHtml(r[1] ?? "")}</h3>
+                        <p>Design: ${escapeHtml(r[4] ?? "")} | Qty: ${escapeHtml(r[5] ?? 0)} | Status: ${escapeHtml(r[13] ?? "Pending")}</p>
+                        <select onchange="updStatus('${party}','${design}',this.value,'OrderSheet')">
+                            <option value="">Update</option>
+                            <option value="Ready">Ready</option>
+                            <option value="Delivered">Delivered</option>
+                        </select>
+                    </div>`;
+                }
+            });
+            document.getElementById("orderList").innerHTML = h || `<div class="empty-state">No orders found.</div>`;
         }
 
         function renderA(data) {
             let h = "";
-            data.forEach(r => { if(r[1]) h += `<div class="card"><button class="btn-delete" onclick="delAlter('${r[1]}','${r[2]}')">Delete</button><h3>${r[1]}</h3><p>${r[2]} (${r[3]}pcs) - ${r[5]}</p><button onclick="updStatus('${r[1]}','${r[2]}','Fixed','AlterSheet')">Mark Fixed</button></div>`; });
-            document.getElementById('alterList').innerHTML = h;
+            data.forEach(r => {
+                if (r[1]) {
+                    const karigar = escapeInlineParam(r[1]);
+                    const item = escapeInlineParam(r[2]);
+                    h += `<div class="card">
+                        <button class="btn-delete" onclick="delAlter('${karigar}','${item}')">Delete</button>
+                        <h3>${escapeHtml(r[1])}</h3>
+                        <p>${escapeHtml(r[2])} (${escapeHtml(r[3] ?? 0)} pcs) - ${escapeHtml(r[5] ?? "Pending")}</p>
+                        <button class="inline-btn" onclick="updStatus('${karigar}','${item}','Fixed','AlterSheet')">Mark Fixed</button>
+                    </div>`;
+                }
+            });
+            document.getElementById("alterList").innerHTML = h || `<div class="empty-state">No alterations found.</div>`;
         }
 
         function runCalc() {
-            let totalQty = 0; let fabCost = 0;
-            for(let i=1; i<=6; i++) {
-                let q = Number(document.getElementById('f'+i+'q').value)||0;
-                let r = Number(document.getElementById('f'+i+'r').value)||0;
-                totalQty += q; fabCost += (q*r);
+            let totalQty = 0;
+            let fabCost = 0;
+
+            for (let i = 1; i <= 6; i++) {
+                const q = Number(document.getElementById("f" + i + "q").value) || 0;
+                const r = Number(document.getElementById("f" + i + "r").value) || 0;
+                totalQty += q;
+                fabCost += q * r;
             }
-            let dye = totalQty * 13;
-            document.getElementById('dye_disp').innerText = "₹" + dye;
-            let finalCost = fabCost + dye + (Number(document.getElementById('stitch').value)||0) + (Number(document.getElementById('hand').value)||0) + (Number(document.getElementById('pack').value)||0);
-            document.getElementById('res').innerText = "Profit: ₹" + (Number(document.getElementById('wholesale').value) - finalCost).toFixed(0);
+
+            const dye = totalQty * 13;
+            document.getElementById("dye_disp").innerText = CURRENCY + dye;
+
+            const finalCost =
+                fabCost +
+                dye +
+                (Number(document.getElementById("stitch").value) || 0) +
+                (Number(document.getElementById("hand").value) || 0) +
+                (Number(document.getElementById("pack").value) || 0);
+
+            document.getElementById("res").innerText =
+                "Profit: " + CURRENCY + (Number(document.getElementById("wholesale").value) - finalCost).toFixed(0);
+        }
+
+        function resetFields(ids) {
+            ids.forEach(id => {
+                const field = document.getElementById(id);
+                if (field) field.value = "";
+            });
         }
 
         async function saveOrder() {
-            await fetch(scriptUrl, { method:'POST', body: JSON.stringify({action:'addOrder', partyName: document.getElementById('party').value, designNo: document.getElementById('o_design').value, qty: document.getElementById('qty').value, rate: document.getElementById('rate').value, sizeBreakdown: document.getElementById('sizes').value, targetDate: document.getElementById('deadline').value}) });
-            closeM('orderModal'); load('OrderSheet');
+            try {
+                await postData({
+                    action: "addOrder",
+                    partyName: document.getElementById("party").value,
+                    designNo: document.getElementById("o_design").value,
+                    qty: document.getElementById("qty").value,
+                    rate: document.getElementById("rate").value,
+                    sizeBreakdown: document.getElementById("sizes").value,
+                    targetDate: document.getElementById("deadline").value
+                });
+
+                resetFields(["o_design", "party", "sizes", "qty", "rate", "deadline"]);
+                closeM("orderModal");
+                await load("OrderSheet");
+            } catch (err) {
+                console.error(err);
+                alert("Order could not be saved. Please try again.");
+            }
         }
 
         async function saveCost() {
-            const d = { action:'addCost', designNo: document.getElementById('c_design').value, f1n: document.getElementById('f1n').value, f1q: document.getElementById('f1q').value, f1r: document.getElementById('f1r').value, f2n: document.getElementById('f2n').value, f2q: document.getElementById('f2q').value, f2r: document.getElementById('f2r').value, f3n: document.getElementById('f3n').value, f3q: document.getElementById('f3q').value, f3r: document.getElementById('f3r').value, f4n: document.getElementById('f4n').value, f4q: document.getElementById('f4q').value, f4r: document.getElementById('f4r').value, f5n: document.getElementById('f5n').value, f5q: document.getElementById('f5q').value, f5r: document.getElementById('f5r').value, f6n: document.getElementById('f6n').value, f6q: document.getElementById('f6q').value, f6r: document.getElementById('f6r').value, stitch: document.getElementById('stitch').value, hand: document.getElementById('hand').value, pack: document.getElementById('pack').value, wholesale: document.getElementById('wholesale').value };
-            await fetch(scriptUrl, { method:'POST', body: JSON.stringify(d) });
-            closeM('costModal'); load('Cost Sheet');
+            const payload = {
+                action: "addCost",
+                designNo: document.getElementById("c_design").value,
+                f1n: document.getElementById("f1n").value,
+                f1q: document.getElementById("f1q").value,
+                f1r: document.getElementById("f1r").value,
+                f2n: document.getElementById("f2n").value,
+                f2q: document.getElementById("f2q").value,
+                f2r: document.getElementById("f2r").value,
+                f3n: document.getElementById("f3n").value,
+                f3q: document.getElementById("f3q").value,
+                f3r: document.getElementById("f3r").value,
+                f4n: document.getElementById("f4n").value,
+                f4q: document.getElementById("f4q").value,
+                f4r: document.getElementById("f4r").value,
+                f5n: document.getElementById("f5n").value,
+                f5q: document.getElementById("f5q").value,
+                f5r: document.getElementById("f5r").value,
+                f6n: document.getElementById("f6n").value,
+                f6q: document.getElementById("f6q").value,
+                f6r: document.getElementById("f6r").value,
+                stitch: document.getElementById("stitch").value,
+                hand: document.getElementById("hand").value,
+                pack: document.getElementById("pack").value,
+                wholesale: document.getElementById("wholesale").value
+            };
+
+            try {
+                await postData(payload);
+                resetFields([
+                    "c_design", "f1n", "f1q", "f1r", "f2n", "f2q", "f2r",
+                    "f3n", "f3q", "f3r", "f4n", "f4q", "f4r",
+                    "f5n", "f5q", "f5r", "f6n", "f6q", "f6r",
+                    "stitch", "hand", "pack", "wholesale"
+                ]);
+                runCalc();
+                closeM("costModal");
+                await load("Cost Sheet");
+            } catch (err) {
+                console.error(err);
+                alert("Costing could not be saved. Please try again.");
+            }
         }
 
         async function saveAlter() {
-            await fetch(scriptUrl, { method:'POST', body: JSON.stringify({action:'addAlter', karigar: document.getElementById('alt_k').value, designNo: document.getElementById('alt_d').value, qty: document.getElementById('alt_q').value, reason: document.getElementById('alt_r').value}) });
-            closeM('alterModal'); load('AlterSheet');
+            try {
+                await postData({
+                    action: "addAlter",
+                    karigar: document.getElementById("alt_k").value,
+                    designNo: document.getElementById("alt_d").value,
+                    qty: document.getElementById("alt_q").value,
+                    reason: document.getElementById("alt_r").value
+                });
+
+                resetFields(["alt_k", "alt_d", "alt_q", "alt_r"]);
+                closeM("alterModal");
+                await load("AlterSheet");
+            } catch (err) {
+                console.error(err);
+                alert("Alteration could not be saved. Please try again.");
+            }
         }
 
-        async function del(id, s) { if(confirm('Delete?')) { await fetch(scriptUrl, { method:'POST', body: JSON.stringify({action:'delete', id:id, designNo:id, sheet:s}) }); load(s); } }
-        async function delAlter(k, i) { if(confirm('Delete?')) { await fetch(scriptUrl, { method:'POST', body: JSON.stringify({action:'delete', sheet:'AlterSheet', karigar:k, item:i}) }); load('AlterSheet'); } }
-        async function updStatus(p, d, s, sheet) { await fetch(scriptUrl, { method:'POST', body: JSON.stringify({action:'updateStatus', party:p, design:d, newStatus:s, targetSheet:sheet}) }); load(sheet); }
-
-        function switchP(p) { 
-            document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-            document.getElementById(p+'Page').classList.add('active');
-            document.getElementById('nav'+p.charAt(0).toUpperCase()+p.slice(1)).classList.add('active');
-            load(p==='cost'?'Cost Sheet':(p==='order'?'OrderSheet':'AlterSheet'));
+        async function delOrder(party, design) {
+            if (confirm("Delete?")) {
+                try {
+                    await postData({
+                        action: "delete",
+                        id: party,
+                        designNo: design,
+                        sheet: "OrderSheet"
+                    });
+                    await load("OrderSheet");
+                } catch (err) {
+                    console.error(err);
+                    alert("Delete failed. Please try again.");
+                }
+            }
         }
-        function openM(id) { document.getElementById(id).style.display='block'; }
-        function closeM(id) { document.getElementById(id).style.display='none'; }
-        load('Cost Sheet');
+
+        async function delCost(design) {
+            if (confirm("Delete?")) {
+                try {
+                    await postData({
+                        action: "delete",
+                        id: design,
+                        designNo: design,
+                        sheet: "Cost Sheet"
+                    });
+                    await load("Cost Sheet");
+                } catch (err) {
+                    console.error(err);
+                    alert("Delete failed. Please try again.");
+                }
+            }
+        }
+
+        async function delAlter(karigar, item) {
+            if (confirm("Delete?")) {
+                try {
+                    await postData({
+                        action: "delete",
+                        sheet: "AlterSheet",
+                        karigar: karigar,
+                        item: item
+                    });
+                    await load("AlterSheet");
+                } catch (err) {
+                    console.error(err);
+                    alert("Delete failed. Please try again.");
+                }
+            }
+        }
+
+        async function updStatus(party, design, status, sheet) {
+            if (!status) return;
+
+            try {
+                await postData({
+                    action: "updateStatus",
+                    party: party,
+                    design: design,
+                    newStatus: status,
+                    targetSheet: sheet
+                });
+                await load(sheet);
+            } catch (err) {
+                console.error(err);
+                alert("Status update failed. Please try again.");
+            }
+        }
+
+        function filter(type) {
+            const inputId = "search" + type.charAt(0).toUpperCase() + type.slice(1);
+            const query = document.getElementById(inputId).value.trim().toLowerCase();
+
+            if (type === "cost") {
+                renderC(cData.filter(r => String(r[0] ?? "").toLowerCase().includes(query)));
+            } else if (type === "order") {
+                renderO(oData.filter(r =>
+                    [r[1], r[4], r[13]].some(value =>
+                        String(value ?? "").toLowerCase().includes(query)
+                    )
+                ));
+            } else {
+                renderA(aData.filter(r =>
+                    [r[1], r[2], r[5]].some(value =>
+                        String(value ?? "").toLowerCase().includes(query)
+                    )
+                ));
+            }
+        }
+
+        function switchP(page) {
+            document.querySelectorAll(".page").forEach(el => el.classList.remove("active"));
+            document.querySelectorAll(".nav-item").forEach(el => el.classList.remove("active"));
+            document.getElementById(page + "Page").classList.add("active");
+            document.getElementById("nav" + page.charAt(0).toUpperCase() + page.slice(1)).classList.add("active");
+            load(page === "cost" ? "Cost Sheet" : (page === "order" ? "OrderSheet" : "AlterSheet"));
+        }
+
+        function openM(id) {
+            document.getElementById(id).style.display = "block";
+        }
+
+        function closeM(id) {
+            document.getElementById(id).style.display = "none";
+        }
+
+        document.querySelectorAll(".modal").forEach(modal => {
+            modal.addEventListener("click", event => {
+                if (event.target === modal) closeM(modal.id);
+            });
+        });
+
+        load("Cost Sheet");
     </script>
 </body>
 </html>
