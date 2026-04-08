@@ -1,549 +1,208 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Simona Management System 2026-27</title>
+    <title>Simona CRM 2026</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-        :root {
-            --gold: #d4a017;
-            --dark: #2c3e50;
-            --green: #27ae60;
-            --light: #f8f9fa;
-            --red: #ff7675;
-            --blue: #3498db;
-            --purple: #9b59b6;
-            --orange: #e67e22;
-            --yellow: #f1c40f;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            background: var(--light);
-            padding-bottom: 90px;
-            color: var(--dark);
-        }
-
-        /* HEADER SECTION */
-        .header {
-            text-align: center;
-            padding: 20px;
-            background: white;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-        }
-        .blessing { font-style: italic; color: #95a5a6; font-size: 0.8em; display: block; margin-bottom: 5px; }
-        h1 { margin: 0; font-size: 1.5em; letter-spacing: 1px; }
-
-        /* NAVIGATION BAR */
-        .navbar {
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-            height: 70px;
-            background: white;
-            display: flex;
-            box-shadow: 0 -2px 15px rgba(0,0,0,0.1);
-            z-index: 1000;
-        }
-        .nav-item {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            color: #7f8c8d;
-            cursor: pointer;
-            font-weight: bold;
-            font-size: 0.8em;
-            transition: 0.3s;
-        }
-        .nav-item.active {
-            color: var(--gold);
-            background: #fffcf5;
-            border-top: 4px solid var(--gold);
-        }
-
-        /* LAYOUT CONTAINER */
+        :root { --gold: #d4a017; --dark: #2c3e50; --green: #27ae60; --light: #f8f9fa; --red: #ff7675; --orange: #e67e22; }
+        body { font-family: 'Segoe UI', sans-serif; margin: 0; background: var(--light); padding-bottom: 90px; }
+        .header { text-align: center; padding: 20px; background: white; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 1000; }
+        .blessing { font-style: italic; color: #95a5a6; font-size: 0.8em; display: block; }
+        .navbar { position: fixed; bottom: 0; width: 100%; height: 70px; background: white; display: flex; box-shadow: 0 -2px 15px rgba(0,0,0,0.1); z-index: 1000; }
+        .nav-item { flex: 1; display: flex; align-items: center; justify-content: center; color: #7f8c8d; cursor: pointer; font-weight: bold; }
+        .nav-item.active { color: var(--gold); background: #fffcf5; border-top: 4px solid var(--gold); }
         .container { padding: 15px; max-width: 800px; margin: auto; }
         .page { display: none; }
-        .page.active { display: block; animation: fadeIn 0.3s ease; }
-
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-        /* SEARCH & INPUTS */
-        .search-box {
-            width: 100%;
-            padding: 15px;
-            margin-bottom: 15px;
-            border-radius: 12px;
-            border: 1px solid #ddd;
-            font-size: 1em;
-            outline: none;
-            box-sizing: border-box;
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
-        }
-        .filter-row { display: flex; gap: 8px; margin-bottom: 15px; }
-        .filter-row select {
-            flex: 1;
-            padding: 12px;
-            border-radius: 10px;
-            border: 1px solid #ddd;
-            background: white;
-            font-size: 0.9em;
-        }
-
-        /* ACTION BUTTONS */
-        .top-btn {
-            width: 100%;
-            padding: 18px;
-            color: white;
-            border: none;
-            border-radius: 15px;
-            font-weight: bold;
-            margin-bottom: 20px;
-            cursor: pointer;
-            font-size: 1.1em;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-
-        /* CARD STYLING */
-        .card {
-            background: white;
-            border-radius: 18px;
-            padding: 20px;
-            margin-bottom: 15px;
-            position: relative;
-            border-left: 8px solid var(--gold);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-            cursor: pointer;
-        }
-        .card:hover { transform: translateY(-2px); transition: 0.2s; }
-        
-        /* Status Colors */
-        .card.status-dye { border-left-color: var(--blue); }
-        .card.status-handwork { border-left-color: var(--purple); }
-        .card.status-stitching { border-left-color: var(--orange); }
-        .card.status-ready { border-left-color: var(--yellow); }
-        .card.status-delivered { border-left-color: var(--green); }
-        .card.status-fixed { border-left-color: var(--green); background: #fafffa; }
-
-        .btn-delete {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            background: #ffeaea;
-            color: var(--red);
-            border: none;
-            border-radius: 8px;
-            padding: 8px 12px;
-            font-weight: bold;
-            font-size: 0.75em;
-        }
-
-        /* MODAL STYLING */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.8);
-            z-index: 2000;
-            overflow-y: auto;
-        }
-        .modal-content {
-            background: white;
-            width: 92%;
-            max-width: 500px;
-            margin: 30px auto;
-            padding: 25px;
-            border-radius: 25px;
-            box-sizing: border-box;
-        }
-        
-        .form-group { margin-bottom: 12px; }
-        .form-group label { display: block; font-size: 0.85em; font-weight: bold; margin-bottom: 5px; color: #7f8c8d; }
-        input, select {
-            width: 100%;
-            padding: 12px;
-            border: 1.5px solid #eee;
-            border-radius: 10px;
-            box-sizing: border-box;
-            font-size: 1em;
-            outline: none;
-        }
-        input:focus { border-color: var(--gold); }
-
-        /* CALCULATOR GRID */
+        .page.active { display: block; }
+        .search-box { width: 100%; padding: 15px; margin-bottom: 15px; border-radius: 12px; border: 1px solid #ddd; box-sizing: border-box; }
+        .top-btn { width: 100%; padding: 18px; color: white; border: none; border-radius: 15px; font-weight: bold; margin-bottom: 20px; cursor: pointer; font-size: 1.1em; }
+        .card { background: white; border-radius: 18px; padding: 20px; margin-bottom: 15px; position: relative; border-left: 8px solid var(--gold); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .btn-delete { position: absolute; top: 15px; right: 15px; background: #ffeaea; color: var(--red); border: none; border-radius: 8px; padding: 8px 12px; font-weight: bold; cursor: pointer; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; overflow-y: auto; }
+        .modal-content { background: white; width: 92%; max-width: 500px; margin: 30px auto; padding: 25px; border-radius: 25px; box-sizing: border-box; }
         .calc-grid { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 8px; margin-bottom: 10px; }
-        .calc-result {
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 15px;
-            margin-top: 15px;
-            border: 1px dashed var(--gold);
-        }
-        .res-row { display: flex; justify-content: space-between; margin-bottom: 5px; }
-
-        .detail-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #f0f0f0; }
-        .status-update-box { margin-top: 15px; padding-top: 15px; border-top: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
+        input { width: 100%; padding: 12px; border: 1.5px solid #eee; border-radius: 10px; box-sizing: border-box; margin-bottom: 10px; font-size: 16px; }
+        label { font-size: 0.8em; font-weight: bold; color: var(--dark); margin-bottom: 4px; display: block; }
+        .res-box { background: #f0f7f0; padding: 15px; border-radius: 15px; border: 1px dashed var(--green); margin-top: 10px; }
+        .status-fixed { border-left-color: var(--green); background: #fafffa; }
     </style>
 </head>
 <body>
 
     <div class="header">
         <span class="blessing">"SHREE GANESHAY NAMAH"</span>
-        <h1 id="pageTitle">Simona Costing</h1>
+        <h1 id="pageTitle">Costing Dashboard</h1>
     </div>
 
     <div class="container">
-        
         <div id="costPage" class="page active">
             <button class="top-btn" style="background: var(--dark);" onclick="openM('costModal')">+ CREATE NEW DESIGN</button>
-            <input type="text" class="search-box" id="searchCost" placeholder="Search Design Number..." onkeyup="filterData('cost')">
+            <input type="text" class="search-box" id="searchCost" placeholder="Search Design No..." onkeyup="filterData('cost')">
             <div id="costList"></div>
         </div>
 
-        <div id="orderPage" class="page">
-            <button class="top-btn" style="background: var(--green);" onclick="openM('orderModal')">+ NEW CUSTOMER ORDER</button>
-            <div class="filter-row">
-                <input type="text" class="search-box" style="margin-bottom:0; flex:2;" id="searchOrder" placeholder="Search Party Name..." onkeyup="filterData('order')">
-                <select id="statusFilter" onchange="filterData('order')">
-                    <option value="">All Status</option>
-                    <option value="Pending">Pending</option>
-                    <option value="In Dye">In Dye</option>
-                    <option value="In Handwork">In Handwork</option>
-                    <option value="In Stitching">In Stitching</option>
-                    <option value="Ready">Ready</option>
-                    <option value="Delivered">Delivered</option>
-                </select>
-            </div>
-            <div id="orderList"></div>
-        </div>
-
         <div id="alterPage" class="page">
-            <button class="top-btn" style="background: var(--orange);" onclick="openM('alterModal')">+ LOG NEW ALTERATION</button>
+            <button class="top-btn" style="background: var(--orange);" onclick="openM('alterModal')">+ LOG ALTERATION</button>
             <input type="text" class="search-box" id="searchAlter" placeholder="Search Karigar Name..." onkeyup="filterData('alter')">
             <div id="alterList"></div>
         </div>
-
     </div>
 
     <div class="navbar">
-        <div class="nav-item active" id="navCost" onclick="switchP('cost')"><span>Costing</span></div>
-        <div class="nav-item" id="navOrder" onclick="switchP('order')"><span>Orders</span></div>
-        <div class="nav-item" id="navAlter" onclick="switchP('alter')"><span>Alterations</span></div>
+        <div class="nav-item active" id="navCost" onclick="switchP('cost')">Costing</div>
+        <div class="nav-item" id="navAlter" onclick="switchP('alter')">Alterations</div>
     </div>
 
-    <div id="costModal" class="modal">
-        <div class="modal-content">
-            <h2 style="margin-top:0;">Design Calculator</h2>
-            <div class="form-group">
-                <label>Design Number</label>
-                <input type="text" id="c_design" placeholder="Enter Design No.">
-            </div>
-
-            <label style="font-size:0.8em; font-weight:bold;">FABRIC ENTRIES</label>
-            <div class="calc-grid">
-                <input type="text" id="f1n" placeholder="Fabric 1 Name">
-                <input type="number" id="f1q" placeholder="Qty" oninput="runCalc()">
-                <input type="number" id="f1r" placeholder="Rate" oninput="runCalc()">
-            </div>
-            <div class="calc-grid">
-                <input type="text" id="f2n" placeholder="Fabric 2 Name">
-                <input type="number" id="f2q" placeholder="Qty" oninput="runCalc()">
-                <input type="number" id="f2r" placeholder="Rate" oninput="runCalc()">
-            </div>
-            <div class="calc-grid">
-                <input type="text" id="f3n" placeholder="Fabric 3 Name">
-                <input type="number" id="f3q" placeholder="Qty" oninput="runCalc()">
-                <input type="number" id="f3r" placeholder="Rate" oninput="runCalc()">
-            </div>
-            <div class="calc-grid">
-                <input type="text" id="f4n" placeholder="Fabric 4 Name">
-                <input type="number" id="f4q" placeholder="Qty" oninput="runCalc()">
-                <input type="number" id="f4r" placeholder="Rate" oninput="runCalc()">
-            </div>
-            <div class="calc-grid">
-                <input type="text" id="f5n" placeholder="Fabric 5 Name">
-                <input type="number" id="f5q" placeholder="Qty" oninput="runCalc()">
-                <input type="number" id="f5r" placeholder="Rate" oninput="runCalc()">
-            </div>
-            <div class="calc-grid">
-                <input type="text" id="f6n" placeholder="Fabric 6 Name">
-                <input type="number" id="f6q" placeholder="Qty" oninput="runCalc()">
-                <input type="number" id="f6r" placeholder="Rate" oninput="runCalc()">
-            </div>
-
-            <label style="font-size:0.8em; font-weight:bold; margin-top:10px; display:block;">LABOUR & EXTRAS</label>
-            <div class="form-group"><input type="number" id="stitch" placeholder="Stitching Charge" oninput="runCalc()"></div>
-            <div class="form-group"><input type="number" id="hand" placeholder="Handwork Charge" oninput="runCalc()"></div>
-            <div class="form-group"><input type="number" id="pack" placeholder="Packing/Dyeing Extras" oninput="runCalc()"></div>
-            <div class="form-group">
-                <label>Wholesale Selling Price</label>
-                <input type="number" id="wholesale" placeholder="Set Price" oninput="runCalc()">
-            </div>
-
-            <div class="calc-result">
-                <div class="res-row"><span>Total Cost:</span><span id="res_total">₹0</span></div>
-                <div class="res-row" style="color:var(--green); font-weight:bold;"><span>Net Profit:</span><span id="res_profit">₹0</span></div>
-            </div>
-
-            <button class="top-btn" style="background: var(--green); margin-top:20px;" onclick="saveCost()">SAVE DESIGN</button>
-            <button onclick="closeM('costModal')" style="width:100%; border:none; background:none; color:red; cursor:pointer;">Discard</button>
+    <div id="costModal" class="modal"><div class="modal-content">
+        <h2 style="margin-top:0;">New Design</h2>
+        <input type="text" id="c_design" placeholder="Design No.">
+        
+        <label>Fabrics (Name | Qty | Rate)</label>
+        <div class="calc-grid"><input type="text" id="f1n" placeholder="F1"><input type="number" id="f1q" placeholder="Qty" oninput="runCalc()"><input type="number" id="f1r" placeholder="Rate" oninput="runCalc()"></div>
+        <div class="calc-grid"><input type="text" id="f2n" placeholder="F2"><input type="number" id="f2q" placeholder="Qty" oninput="runCalc()"><input type="number" id="f2r" placeholder="Rate" oninput="runCalc()"></div>
+        <div class="calc-grid"><input type="text" id="f3n" placeholder="F3"><input type="number" id="f3q" placeholder="Qty" oninput="runCalc()"><input type="number" id="f3r" placeholder="Rate" oninput="runCalc()"></div>
+        <div class="calc-grid"><input type="text" id="f4n" placeholder="F4"><input type="number" id="f4q" placeholder="Qty" oninput="runCalc()"><input type="number" id="f4r" placeholder="Rate" oninput="runCalc()"></div>
+        <div class="calc-grid"><input type="text" id="f5n" placeholder="F5"><input type="number" id="f5q" placeholder="Qty" oninput="runCalc()"><input type="number" id="f5r" placeholder="Rate" oninput="runCalc()"></div>
+        <div class="calc-grid"><input type="text" id="f6n" placeholder="F6"><input type="number" id="f6q" placeholder="Qty" oninput="runCalc()"><input type="number" id="f6r" placeholder="Rate" oninput="runCalc()"></div>
+        
+        <label>Labour Charges</label>
+        <input type="number" id="stitch" placeholder="Stitching" oninput="runCalc()">
+        <input type="number" id="hand" placeholder="Handwork" oninput="runCalc()">
+        
+        <label>Packing Charges (Manual)</label>
+        <input type="number" id="pack" placeholder="Packing Cost" oninput="runCalc()">
+        
+        <label>Dyeing (Auto: Total Qty x 13)</label>
+        <input type="text" id="dye_disp" value="₹0" readonly style="background:#f0f0f0; color:#666; font-weight:bold;">
+        
+        <label>Wholesale Price</label>
+        <input type="number" id="wholesale" placeholder="Selling Price" oninput="runCalc()">
+        
+        <div class="res-box">
+            <p style="margin:5px 0;">Total Cost: <span id="res_total" style="font-weight:bold;">₹0</span></p>
+            <p style="margin:5px 0; color:var(--green); font-weight:bold;">Profit: <span id="res_profit">₹0</span></p>
         </div>
-    </div>
+        
+        <button class="top-btn" style="background: var(--green); margin-top:20px;" onclick="saveCost()">SAVE DESIGN</button>
+        <button onclick="closeM('costModal')" style="width:100%; border:none; background:none; color:red; cursor:pointer;">Discard</button>
+    </div></div>
 
-    <div id="orderModal" class="modal">
-        <div class="modal-content">
-            <h2>New Party Order</h2>
-            <input type="text" id="o_design" placeholder="Design No">
-            <input type="text" id="party" placeholder="Party Name">
-            <input type="text" id="sizes" placeholder="Size Breakdown (e.g. 2-L, 5-XL)">
-            <input type="number" id="qty" placeholder="Total Pieces">
-            <input type="number" id="rate" placeholder="Selling Rate">
-            <label>Deadline Date</label>
-            <input type="date" id="deadline">
-            <button class="top-btn" style="background: var(--green); margin-top:15px;" onclick="saveOrder()">BOOK ORDER</button>
-            <button onclick="closeM('orderModal')" style="width:100%; border:none; background:none; color:red;">Cancel</button>
-        </div>
-    </div>
-
-    <div id="alterModal" class="modal">
-        <div class="modal-content">
-            <h2>Log Alteration</h2>
-            <input type="text" id="alt_k" placeholder="Karigar Name">
-            <input type="text" id="alt_d" placeholder="Item/Design Description">
-            <input type="number" id="alt_q" placeholder="Qty to Fix">
-            <input type="text" id="alt_r" placeholder="Reason for Alteration">
-            <button class="top-btn" style="background: var(--orange); margin-top:15px;" onclick="saveAlter()">SEND TO KARIGAR</button>
-            <button onclick="closeM('alterModal')" style="width:100%; border:none; background:none; color:red;">Cancel</button>
-        </div>
-    </div>
-
-    <div id="detailsModal" class="modal">
-        <div class="modal-content">
-            <h2 id="detTitle">Information</h2>
-            <div id="detBody"></div>
-            <button class="top-btn" style="background: var(--dark); margin-top:20px;" onclick="closeM('detailsModal')">CLOSE</button>
-        </div>
-    </div>
+    <div id="alterModal" class="modal"><div class="modal-content">
+        <h2>Log Alteration</h2>
+        <input type="text" id="alt_k" placeholder="Karigar Name">
+        <input type="text" id="alt_d" placeholder="Design/Item Name">
+        <input type="number" id="alt_q" placeholder="Quantity">
+        <input type="text" id="alt_r" placeholder="Reason for Alteration">
+        <button class="top-btn" style="background: var(--orange);" onclick="saveAlter()">SEND TO KARIGAR</button>
+        <button onclick="closeM('alterModal')" style="width:100%; border:none; background:none; color:red; cursor:pointer;">Cancel</button>
+    </div></div>
 
     <script>
-        const scriptUrl = "https://script.google.com/macros/s/AKfycbwVxoVI5Zznu6bSsYnVi8NG3RkGZwjHOmqufMlga5RVjRhAZYwnSq9WcsNDgtYlHysWCg/exec";
-        let cData = [], oData = [], aData = [];
+        const scriptUrl = "YOUR_SCRIPT_URL_HERE"; // CRITICAL: Update this!
+        let cData = [], aData = [];
 
-        // Labels for the Detail View
-        const cLabels = ["Design No", "F1 Name", "F1 Qty", "F1 Rate", "F2 Name", "F2 Qty", "F2 Rate", "F3 Name", "F3 Qty", "F3 Rate", "F4 Name", "F4 Qty", "F4 Rate", "F5 Name", "F5 Qty", "F5 Rate", "F6 Name", "F6 Qty", "F6 Rate", "Total Fabric Qty", "Dyeing (Fixed)", "Handwork", "Stitching", "Packing", "Total Final Cost", "Wholesale Price", "Profit"];
-        const oLabels = ["ID", "Party Name", "Order Date", "Deadline", "Design No", "Order Qty", "Size Details", "Rate", "Total Amount", "Delivery Date", "Delivered Qty", "Invoice No", "Balance", "Current Status"];
-        const aLabels = ["Date Logged", "Karigar", "Item Details", "Qty", "Reason", "Status", "Fixed Date"];
-
-        // PAGE SWITCHER
-        function switchP(p) {
-            document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-            document.getElementById(p+'Page').classList.add('active');
-            document.getElementById('nav'+p.charAt(0).toUpperCase()+p.slice(1)).classList.add('active');
-            
-            const titles = {cost: "Simona Costing", order: "Simona Orders", alter: "Simona Alterations"};
-            document.getElementById('pageTitle').innerText = titles[p];
-            
-            const sheets = {cost: "Cost Sheet", order: "OrderSheet", alter: "AlterSheet"};
-            load(sheets[p]);
-        }
-
-        // FETCH DATA
         async function load(s) {
-            try {
-                const res = await fetch(`${scriptUrl}?sheet=${encodeURIComponent(s)}`);
-                const json = await res.json();
-                if(s === "Cost Sheet") { cData = json; renderC(json); }
-                else if(s === "OrderSheet") { oData = json; renderO(json); }
-                else { aData = json; renderA(json); }
-            } catch(e) { alert("Error loading data. Check Web App URL."); }
+            const res = await fetch(`${scriptUrl}?sheet=${encodeURIComponent(s)}`);
+            const json = await res.json();
+            if(s === "Cost Sheet") { cData = json; renderC(json); }
+            else { aData = json; renderA(json); }
         }
 
-        // RENDER COST CARDS
         function renderC(data) {
             let h = "";
-            data.forEach((r, i) => { 
-                if(r[0]) {
-                    h += `<div class="card" onclick="viewDet(${i},'cost')">
-                        <button class="btn-delete" onclick="event.stopPropagation(); del('${r[0]}','Cost Sheet')">Delete</button>
-                        <h3 style="margin:0;">Design: ${r[0]}</h3>
-                        <p style="margin:5px 0; color:var(--green); font-weight:bold;">Profit: ₹${r[26]}</p>
-                        <p style="margin:0; font-size:0.8em; color:gray;">Fabric Total: ${r[19]} meters</p>
-                    </div>`;
-                }
-            });
-            document.getElementById('costList').innerHTML = h || "No Designs Found";
+            data.forEach((r, i) => { if(r[0]) h += `<div class="card">
+                <button class="btn-delete" onclick="del('${r[0]}','Cost Sheet')">Delete</button>
+                <h3>Design: ${r[0]}</h3><p style="color:var(--green); font-weight:bold;">Profit: ₹${r[26]}</p>
+                <small style="color:gray;">Fabric Qty: ${r[19]}m | Dyeing: ₹${r[20]}</small></div>`; });
+            document.getElementById('costList').innerHTML = h;
         }
 
-        // RENDER ORDER CARDS
-        function renderO(data) {
-            let h = "";
-            data.forEach((r, i) => { 
-                if(r[1]) {
-                    const st = r[13] || 'Pending';
-                    const stCls = st.toLowerCase().replace(" ", "-");
-                    h += `<div class="card status-${stCls}" onclick="viewDet(${i},'order')">
-                        <button class="btn-delete" onclick="event.stopPropagation(); del('${r[1]}','OrderSheet')">Delete</button>
-                        <h3 style="margin:0;">${r[1]}</h3>
-                        <p style="margin:5px 0;">Design: ${r[4]} | Qty: ${r[5]}</p>
-                        <div class="status-update-box">
-                            <span style="font-weight:bold; font-size:0.85em; color:var(--dark);">${st}</span>
-                            <select style="width:auto; padding:5px; font-size:0.8em;" onclick="event.stopPropagation()" onchange="updStatus('${r[1]}','${r[4]}',this.value,'OrderSheet')">
-                                <option value="">Change Status</option>
-                                <option value="In Dye">In Dye</option>
-                                <option value="In Handwork">In Handwork</option>
-                                <option value="In Stitching">In Stitching</option>
-                                <option value="Ready">Ready</option>
-                                <option value="Delivered">Delivered</option>
-                            </select>
-                        </div>
-                    </div>`;
-                }
-            });
-            document.getElementById('orderList').innerHTML = h || "No Orders Found";
-        }
-
-        // RENDER ALTERATION CARDS
         function renderA(data) {
             let h = "";
-            data.forEach((r, i) => { 
-                if(r[1]) {
-                    const st = r[5] || 'Sent';
-                    h += `<div class="card ${st === 'Fixed' ? 'status-fixed' : ''}" onclick="viewDet(${i},'alter')">
-                        <button class="btn-delete" onclick="event.stopPropagation(); del('${r[1]}','AlterSheet')">Delete</button>
-                        <h3 style="margin:0;">${r[1]}</h3>
-                        <p style="margin:5px 0;">${r[2]} | Qty: ${r[3]}</p>
-                        <div class="status-update-box">
-                            <span style="font-weight:bold;">${st}</span>
-                            ${st !== 'Fixed' ? `<button onclick="event.stopPropagation(); updStatus('${r[1]}','${r[2]}','Fixed','AlterSheet')" style="background:var(--green); color:white; border:none; padding:8px 15px; border-radius:8px; font-weight:bold; cursor:pointer;">Mark Fixed</button>` : `<span style="font-size:0.8em; color:gray;">Return: ${new Date(r[6]).toLocaleDateString()}</span>`}
-                        </div>
-                    </div>`;
-                }
-            });
-            document.getElementById('alterList').innerHTML = h || "No Alterations Found";
+            data.forEach((r, i) => { if(r[1]) {
+                const st = r[5] || 'Sent';
+                h += `<div class="card ${st === 'Fixed' ? 'status-fixed' : ''}">
+                    <button class="btn-delete" onclick="delAlter('${r[1]}','${r[2]}')">Delete</button>
+                    <h3>${r[1]}</h3><p>${r[2]} (Qty: ${r[3]})</p>
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;">
+                        <b>Status: ${st}</b>
+                        ${st !== 'Fixed' ? `<button onclick="updStatus('${r[1]}','${r[2]}','Fixed','AlterSheet')" style="background:var(--green); color:white; border:none; padding:8px 12px; border-radius:8px; cursor:pointer;">Mark Fixed</button>` : `<span style="font-size:0.8em; color:gray;">Return: ${new Date(r[6]).toLocaleDateString()}</span>`}
+                    </div>
+                </div>`;
+            }});
+            document.getElementById('alterList').innerHTML = h;
         }
 
-        // STATUS UPDATER
-        async function updStatus(p, d, s, sheet) {
-            if(!s) return;
-            await fetch(scriptUrl, { method:'POST', body: JSON.stringify({action:'updateStatus', party:p, design:d, newStatus:s, targetSheet:sheet}) });
-            load(sheet);
+        function runCalc() {
+            let totalQty = 0; let fabricCost = 0;
+            for(let i=1; i<=6; i++){
+                let q = Number(document.getElementById('f'+i+'q').value)||0;
+                let r = Number(document.getElementById('f'+i+'r').value)||0;
+                totalQty += q; fabricCost += (q*r);
+            }
+            const autoDye = totalQty * 13;
+            document.getElementById('dye_disp').value = "₹" + autoDye.toFixed(0);
+            const totalFinal = fabricCost + autoDye + (Number(document.getElementById('stitch').value)||0) + (Number(document.getElementById('hand').value)||0) + (Number(document.getElementById('pack').value)||0);
+            const profit = (Number(document.getElementById('wholesale').value)||0) - totalFinal;
+            document.getElementById('res_total').innerText = "₹" + totalFinal.toFixed(0);
+            document.getElementById('res_profit').innerText = "₹" + profit.toFixed(0);
         }
 
-        // DELETE HANDLER
+        async function delAlter(karigar, item) {
+            if(confirm('Delete this record?')) {
+                await fetch(scriptUrl, { method:'POST', body: JSON.stringify({action:'delete', sheet:'AlterSheet', karigar:karigar, item:item}) });
+                load('AlterSheet');
+            }
+        }
+
         async function del(id, s) {
-            if(confirm('Are you sure you want to delete this record? This cannot be undone.')) {
-                await fetch(scriptUrl, { method:'POST', body: JSON.stringify({action:'delete', designNo:id, id:id, sheet:s}) });
+            if(confirm('Delete design ' + id + '?')) {
+                await fetch(scriptUrl, { method:'POST', body: JSON.stringify({action:'delete', designNo:id, sheet:s}) });
                 load(s);
             }
         }
 
-        // THE CALCULATOR (MANUAL CALCULATION)
-        function runCalc() {
-            const f1 = (Number(document.getElementById('f1q').value)||0) * (Number(document.getElementById('f1r').value)||0);
-            const f2 = (Number(document.getElementById('f2q').value)||0) * (Number(document.getElementById('f2r').value)||0);
-            const f3 = (Number(document.getElementById('f3q').value)||0) * (Number(document.getElementById('f3r').value)||0);
-            const f4 = (Number(document.getElementById('f4q').value)||0) * (Number(document.getElementById('f4r').value)||0);
-            const f5 = (Number(document.getElementById('f5q').value)||0) * (Number(document.getElementById('f5r').value)||0);
-            const f6 = (Number(document.getElementById('f6q').value)||0) * (Number(document.getElementById('f6r').value)||0);
-            
-            const totalQty = (Number(document.getElementById('f1q').value)||0) + (Number(document.getElementById('f2q').value)||0) + (Number(document.getElementById('f3q').value)||0) + (Number(document.getElementById('f4q').value)||0) + (Number(document.getElementById('f5q').value)||0) + (Number(document.getElementById('f6q').value)||0);
-            const dyeFixed = totalQty * 13;
-            
-            const totalCost = f1+f2+f3+f4+f5+f6 + dyeFixed + (Number(document.getElementById('stitch').value)||0) + (Number(document.getElementById('hand').value)||0) + (Number(document.getElementById('pack').value)||0);
-            const whole = Number(document.getElementById('wholesale').value)||0;
-            
-            document.getElementById('res_total').innerText = "₹" + totalCost.toFixed(0);
-            document.getElementById('res_profit').innerText = "₹" + (whole - totalCost).toFixed(0);
-        }
-
-        // SAVING DATA
         async function saveCost() {
-            const d = { 
-                action:'addCost', 
-                designNo: document.getElementById('c_design').value,
+            const d = { action:'addCost', designNo: document.getElementById('c_design').value,
                 f1n: document.getElementById('f1n').value, f1q: document.getElementById('f1q').value, f1r: document.getElementById('f1r').value,
                 f2n: document.getElementById('f2n').value, f2q: document.getElementById('f2q').value, f2r: document.getElementById('f2r').value,
                 f3n: document.getElementById('f3n').value, f3q: document.getElementById('f3q').value, f3r: document.getElementById('f3r').value,
                 f4n: document.getElementById('f4n').value, f4q: document.getElementById('f4q').value, f4r: document.getElementById('f4r').value,
                 f5n: document.getElementById('f5n').value, f5q: document.getElementById('f5q').value, f5r: document.getElementById('f5r').value,
                 f6n: document.getElementById('f6n').value, f6q: document.getElementById('f6q').value, f6r: document.getElementById('f6r').value,
-                stitch: document.getElementById('stitch').value, hand: document.getElementById('hand').value, pack: document.getElementById('pack').value,
-                wholesale: document.getElementById('wholesale').value
+                stitch: document.getElementById('stitch').value, hand: document.getElementById('hand').value, pack: document.getElementById('pack').value, wholesale: document.getElementById('wholesale').value
             };
             await fetch(scriptUrl, { method:'POST', body: JSON.stringify(d) });
             closeM('costModal'); load('Cost Sheet');
         }
 
-        async function saveOrder() {
-            const d = { 
-                targetSheet: 'OrderSheet', 
-                designNo: document.getElementById('o_design').value, 
-                partyName: document.getElementById('party').value, 
-                sizeBreakdown: document.getElementById('sizes').value, 
-                qty: document.getElementById('qty').value, 
-                rate: document.getElementById('rate').value, 
-                targetDate: document.getElementById('deadline').value 
-            };
-            await fetch(scriptUrl, { method:'POST', body: JSON.stringify(d) });
-            closeM('orderModal'); load('OrderSheet');
-        }
-
         async function saveAlter() {
-            const d = { 
-                action:'addAlter', 
-                karigar: document.getElementById('alt_k').value, 
-                designNo: document.getElementById('alt_d').value, 
-                qty: document.getElementById('alt_q').value, 
-                reason: document.getElementById('alt_r').value 
-            };
+            const d = { action:'addAlter', karigar: document.getElementById('alt_k').value, designNo: document.getElementById('alt_d').value, qty: document.getElementById('alt_q').value, reason: document.getElementById('alt_r').value };
             await fetch(scriptUrl, { method:'POST', body: JSON.stringify(d) });
             closeM('alterModal'); load('AlterSheet');
         }
 
-        // VIEW DETAILS POPUP
-        function viewDet(idx, type) {
-            const labels = type === 'cost' ? cLabels : (type === 'order' ? oLabels : aLabels);
-            const rowData = type === 'cost' ? cData[idx] : (type === 'order' ? oData[idx] : aData[idx]);
-            let h = "";
-            rowData.forEach((val, i) => {
-                if(labels[i]) {
-                    let displayVal = val;
-                    if(labels[i].includes("Date") && val) displayVal = new Date(val).toLocaleDateString();
-                    h += `<div class="detail-row"><span>${labels[i]}</span><b>${displayVal || '-'}</b></div>`;
-                }
-            });
-            document.getElementById('detBody').innerHTML = h;
-            document.getElementById('detTitle').innerText = type.toUpperCase() + " Details";
-            openM('detailsModal');
+        async function updStatus(p, d, s, sheet) {
+            await fetch(scriptUrl, { method:'POST', body: JSON.stringify({action:'updateStatus', party:p, design:d, newStatus:s, targetSheet:sheet}) });
+            load(sheet);
         }
 
-        // SEARCH & FILTER LOGIC
         function filterData(type) {
-            const query = document.getElementById(type === 'cost' ? 'searchCost' : (type === 'order' ? 'searchOrder' : 'searchAlter')).value.toLowerCase();
-            if(type === 'cost') {
-                renderC(cData.filter(r => r[0].toString().toLowerCase().includes(query)));
-            } else if(type === 'order') {
-                const statFilter = document.getElementById('statusFilter').value;
-                renderO(oData.filter(r => r[1].toLowerCase().includes(query) && (statFilter === "" || r[13] === statFilter)));
-            } else {
-                renderA(aData.filter(r => r[1].toLowerCase().includes(query)));
-            }
+            const q = document.getElementById(type === 'cost' ? 'searchCost' : 'searchAlter').value.toLowerCase();
+            if(type === 'cost') renderC(cData.filter(r => r[0].toString().toLowerCase().includes(q)));
+            else renderA(aData.filter(r => r[1].toLowerCase().includes(q)));
         }
 
-        // MODAL HELPERS
+        function switchP(p) { 
+            document.querySelectorAll('.page').forEach(el => el.classList.remove('active')); 
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            document.getElementById(p+'Page').classList.add('active'); 
+            document.getElementById('nav'+p.charAt(0).toUpperCase()+p.slice(1)).classList.add('active');
+            load(p==='cost'?'Cost Sheet':'AlterSheet'); 
+        }
         function openM(id) { document.getElementById(id).style.display = 'block'; }
         function closeM(id) { document.getElementById(id).style.display = 'none'; }
-
-        // INITIAL LOAD
+        
         load('Cost Sheet');
     </script>
 </body>
