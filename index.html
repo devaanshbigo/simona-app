@@ -23,7 +23,7 @@
         .btn-delete { position: absolute; top: 15px; right: 15px; background: #ffeaea; color: var(--red); border: none; border-radius: 8px; padding: 8px 12px; font-weight: bold; cursor: pointer; }
         .modal { display: none; position: fixed; inset: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; overflow-y: auto; }
         .modal-content { background: white; width: 92%; max-width: 520px; margin: 30px auto; padding: 25px; border-radius: 25px; box-sizing: border-box; }
-        .detail-modal-content { max-width: 720px; }
+        .detail-modal-content { max-width: 760px; }
         input, select { width: 100%; padding: 12px; border: 1.5px solid #eee; border-radius: 10px; box-sizing: border-box; margin-bottom: 10px; }
         .calc-grid { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 8px; margin-bottom: 5px; }
         .inline-btn { padding: 10px 14px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; background: var(--orange); color: white; }
@@ -31,17 +31,21 @@
         .detail-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 18px; }
         .detail-title { margin: 0; color: var(--dark); }
         .detail-subtitle { color: #7f8c8d; font-size: 0.92em; margin-top: 6px; }
-        .detail-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 18px; }
-        .detail-item { background: #faf7ef; border-radius: 14px; padding: 14px; }
-        .detail-label { color: #7f8c8d; font-size: 0.85em; margin-bottom: 6px; }
-        .detail-value { color: var(--dark); font-weight: 600; word-break: break-word; }
-        .detail-section { margin-top: 18px; }
-        .detail-section h3 { margin-bottom: 10px; color: var(--dark); }
-        .line-list { display: grid; gap: 10px; }
-        .line-item { background: #f8f9fa; border-radius: 14px; padding: 12px 14px; display: flex; justify-content: space-between; gap: 10px; }
-        .line-item strong { color: var(--dark); }
         .close-btn { background: #f4f4f4; color: var(--dark); border: none; border-radius: 10px; padding: 10px 14px; cursor: pointer; font-weight: bold; }
-        .detail-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 18px; flex-wrap: wrap; }
+        .detail-section { margin-top: 18px; }
+        .detail-section h3 { margin: 0 0 10px; color: var(--dark); }
+        .detail-list { background: #fffaf0; border-radius: 16px; overflow: hidden; border: 1px solid #f2e5bf; }
+        .detail-row { display: grid; grid-template-columns: minmax(130px, 220px) 1fr; gap: 12px; padding: 12px 14px; border-bottom: 1px solid #f0e6c8; }
+        .detail-row:last-child { border-bottom: none; }
+        .detail-key { color: #7f8c8d; font-weight: 600; }
+        .detail-val { color: var(--dark); font-weight: 500; word-break: break-word; }
+        .line-list { display: grid; gap: 10px; }
+        .line-item { background: #f8f9fa; border-radius: 14px; padding: 12px 14px; }
+        .line-item-title { color: var(--dark); font-weight: bold; margin-bottom: 6px; }
+        .line-item-sub { color: #5f6c72; font-size: 0.92em; }
+        @media (max-width: 600px) {
+            .detail-row { grid-template-columns: 1fr; gap: 4px; }
+        }
     </style>
 </head>
 <body>
@@ -88,7 +92,7 @@
         <input type="number" id="stitch" placeholder="Stitching" oninput="runCalc()">
         <input type="number" id="hand" placeholder="Handwork" oninput="runCalc()">
         <input type="number" id="pack" placeholder="Packing Cost" oninput="runCalc()">
-        <label>Dyeing (Qty x 13): <span id="dye_disp" style="font-weight:bold;">₹0</span></label>
+        <label>Dyeing (Qty x 13): <span id="dye_disp" style="font-weight:bold;">‹0</span></label>
         <input type="number" id="wholesale" placeholder="Wholesale Price" oninput="runCalc()">
         <div id="res" style="font-weight:bold; color:var(--green); background:#f0f0f0; padding:10px; border-radius:10px;">Profit: ₹0</div>
         <button class="top-btn" style="background: var(--dark); margin-top:10px;" onclick="saveCost()">SAVE COSTING</button>
@@ -119,7 +123,7 @@
     </div></div>
 
     <script>
-        const scriptUrl = "https://script.google.com/macros/s/AKfycbw735TvAitE_0Nqr7KGK2IaK2Ta08jjiunBfpFI0Lvx_TQEpdyAXTzDTCQ0n6VoNSPszA/exec";
+        const scriptUrl = "https://script.google.com/macros/s/AKfycbw375TvAitE_0Nqr7KGK2IaK2Ta08jjiunBfpFI0Lvx_TQEpdyAXtzDTCQ0n6VoNSPszA/exec";
         const CURRENCY = "₹";
         let cData = [], oData = [], aData = [];
 
@@ -164,12 +168,12 @@
             return date.toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
         }
 
-        function createDetailItem(label, value) {
-            return `<div class="detail-item"><div class="detail-label">${escapeHtml(label)}</div><div class="detail-value">${escapeHtml(value)}</div></div>`;
+        function createDetailRow(label, value) {
+            return `<div class="detail-row"><div class="detail-key">${escapeHtml(label)}</div><div class="detail-val">${escapeHtml(value)}</div></div>`;
         }
 
-        function createLineItem(title, rightText) {
-            return `<div class="line-item"><strong>${escapeHtml(title)}</strong><span>${escapeHtml(rightText)}</span></div>`;
+        function createLineItem(title, subtitle) {
+            return `<div class="line-item"><div class="line-item-title">${escapeHtml(title)}</div><div class="line-item-sub">${escapeHtml(subtitle)}</div></div>`;
         }
 
         async function requestJson(sheet) {
@@ -220,11 +224,18 @@
                 const name = safeText(r[base], "");
                 const qty = safeNumber(r[base + 1], 0);
                 const rate = safeNumber(r[base + 2], 0);
-                if (name || qty || rate) fabrics.push({ name: name || `Fabric ${i + 1}`, qty, rate, total: qty * rate });
+                if (name || qty || rate) {
+                    fabrics.push({
+                        name: name || `Fabric ${i + 1}`,
+                        qty,
+                        rate,
+                        total: qty * rate
+                    });
+                }
             }
 
             const fabricsHtml = fabrics.length
-                ? fabrics.map(item => createLineItem(`${item.name} | Qty: ${item.qty}`, `${formatCurrency(item.rate)} rate | ${formatCurrency(item.total)} total`)).join("")
+                ? fabrics.map(item => createLineItem(`${item.name}`, `Qty: ${item.qty} | Rate: ${formatCurrency(item.rate)} | Total: ${formatCurrency(item.total)}`)).join("")
                 : `<div class="empty-state">No fabric breakdown available.</div>`;
 
             document.getElementById("detailBody").innerHTML = `
@@ -235,15 +246,19 @@
                     </div>
                     <button class="close-btn" onclick="closeM('detailModal')">Close</button>
                 </div>
-                <div class="detail-grid">
-                    ${createDetailItem("Total Qty", safeText(r[19]))}
-                    ${createDetailItem("Dyeing", formatCurrency(r[20]))}
-                    ${createDetailItem("Handwork", formatCurrency(r[21]))}
-                    ${createDetailItem("Stitching", formatCurrency(r[22]))}
-                    ${createDetailItem("Packing", formatCurrency(r[23]))}
-                    ${createDetailItem("Final Cost", formatCurrency(r[24]))}
-                    ${createDetailItem("Wholesale", formatCurrency(r[25]))}
-                    ${createDetailItem("Profit", formatCurrency(r[26]))}
+                <div class="detail-section">
+                    <h3>Summary</h3>
+                    <div class="detail-list">
+                        ${createDetailRow("Design No", safeText(r[0]))}
+                        ${createDetailRow("Total Qty", safeText(r[19]))}
+                        ${createDetailRow("Dyeing", formatCurrency(r[20]))}
+                        ${createDetailRow("Handwork", formatCurrency(r[21]))}
+                        ${createDetailRow("Stitching", formatCurrency(r[22]))}
+                        ${createDetailRow("Packing", formatCurrency(r[23]))}
+                        ${createDetailRow("Final Cost", formatCurrency(r[24]))}
+                        ${createDetailRow("Wholesale", formatCurrency(r[25]))}
+                        ${createDetailRow("Profit", formatCurrency(r[26]))}
+                    </div>
                 </div>
                 <div class="detail-section">
                     <h3>Fabric Breakdown</h3>
@@ -265,20 +280,18 @@
                     </div>
                     <button class="close-btn" onclick="closeM('detailModal')">Close</button>
                 </div>
-                <div class="detail-grid">
-                    ${createDetailItem("Party Name", safeText(r[1]))}
-                    ${createDetailItem("Design No", safeText(r[4]))}
-                    ${createDetailItem("Order Date", formatDate(r[0]))}
-                    ${createDetailItem("Target Date", formatDate(r[3]))}
-                    ${createDetailItem("Total Qty", safeText(r[5]))}
-                    ${createDetailItem("Rate", formatCurrency(r[7]))}
-                    ${createDetailItem("Amount", formatCurrency(r[8]))}
-                    ${createDetailItem("Status", safeText(r[13], "Pending"))}
-                </div>
                 <div class="detail-section">
-                    <h3>Size Breakdown</h3>
-                    <div class="detail-item">
-                        <div class="detail-value">${escapeHtml(safeText(r[6]))}</div>
+                    <h3>Order Details</h3>
+                    <div class="detail-list">
+                        ${createDetailRow("Party Name", safeText(r[1]))}
+                        ${createDetailRow("Design No", safeText(r[4]))}
+                        ${createDetailRow("Order Date", formatDate(r[0]))}
+                        ${createDetailRow("Target Date", formatDate(r[3]))}
+                        ${createDetailRow("Total Qty", safeText(r[5]))}
+                        ${createDetailRow("Rate", formatCurrency(r[7]))}
+                        ${createDetailRow("Amount", formatCurrency(r[8]))}
+                        ${createDetailRow("Status", safeText(r[13], "Pending"))}
+                        ${createDetailRow("Size Breakdown", safeText(r[6]))}
                     </div>
                 </div>
             `;
@@ -297,14 +310,17 @@
                     </div>
                     <button class="close-btn" onclick="closeM('detailModal')">Close</button>
                 </div>
-                <div class="detail-grid">
-                    ${createDetailItem("Karigar", safeText(r[1]))}
-                    ${createDetailItem("Design / Item", safeText(r[2]))}
-                    ${createDetailItem("Qty", safeText(r[3]))}
-                    ${createDetailItem("Reason", safeText(r[4]))}
-                    ${createDetailItem("Status", safeText(r[5]))}
-                    ${createDetailItem("Logged On", formatDate(r[0]))}
-                    ${createDetailItem("Fixed On", formatDate(r[6]))}
+                <div class="detail-section">
+                    <h3>Alteration Details</h3>
+                    <div class="detail-list">
+                        ${createDetailRow("Karigar", safeText(r[1]))}
+                        ${createDetailRow("Design / Item", safeText(r[2]))}
+                        ${createDetailRow("Qty", safeText(r[3]))}
+                        ${createDetailRow("Reason", safeText(r[4]))}
+                        ${createDetailRow("Status", safeText(r[5]))}
+                        ${createDetailRow("Logged On", formatDate(r[0]))}
+                        ${createDetailRow("Fixed On", formatDate(r[6]))}
+                    </div>
                 </div>
             `;
             openM("detailModal");
